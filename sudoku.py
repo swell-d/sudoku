@@ -20,6 +20,10 @@ def get_column(data, column):
     return data[column - 1: 81: 9]
 
 
+def get_square(data, square):
+    return data[0:3] + data[9:12] + data[18:21]
+
+
 class SudokuTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
                    5, None, 4, None, 2, None, None, 1, None,
@@ -73,6 +77,32 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_column(self.sample_data, 7), self.sample_data[6:81:9])
         self.assertEqual(get_column(self.sample_data, 8), self.sample_data[7:81:9])
         self.assertEqual(get_column(self.sample_data, 9), self.sample_data[8:81:9])
+
+    def test_get_square_return_something(self):
+        self.assertIsNotNone(get_square(self.sample_data, 1))
+
+    def test_get_square_return_9_numbers(self):
+        self.assertEqual(len(get_square(self.sample_data, 1)), 9)
+
+    def test_get_square_return_part_of_sample(self):
+        self.assertEqual(get_square(self.sample_data, 1),
+                         self.sample_data[0:3] + self.sample_data[9:12] + self.sample_data[18:21])
+        self.assertEqual(get_square(self.sample_data, 2),
+                         self.sample_data[3:6] + self.sample_data[12:15] + self.sample_data[21:24])
+        self.assertEqual(get_square(self.sample_data, 3),
+                         self.sample_data[6:9] + self.sample_data[15:18] + self.sample_data[24:27])
+        self.assertEqual(get_square(self.sample_data, 4),
+                         self.sample_data[27:30] + self.sample_data[36:39] + self.sample_data[45:48])
+        self.assertEqual(get_square(self.sample_data, 5),
+                         self.sample_data[30:33] + self.sample_data[39:42] + self.sample_data[48:51])
+        self.assertEqual(get_square(self.sample_data, 6),
+                         self.sample_data[33:36] + self.sample_data[42:45] + self.sample_data[51:54])
+        self.assertEqual(get_square(self.sample_data, 7),
+                         self.sample_data[54:57] + self.sample_data[63:66] + self.sample_data[72:75])
+        self.assertEqual(get_square(self.sample_data, 8),
+                         self.sample_data[57:60] + self.sample_data[66:69] + self.sample_data[75:78])
+        self.assertEqual(get_square(self.sample_data, 9),
+                         self.sample_data[60:63] + self.sample_data[69:72] + self.sample_data[78:81])
 
 
 if __name__ == '__main__':
