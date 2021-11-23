@@ -12,15 +12,15 @@ def read_xlsx(filename):
     return result
 
 
-def get_row(data, row):
+def get_row_values(data, row):
     return data[9 * row - 9: 9 * row]
 
 
-def get_column(data, column):
+def get_column_values(data, column):
     return data[column - 1: 81: 9]
 
 
-def get_square(data, square):
+def get_square_values(data, square):
     factor = (square + 2) % 3
     if square in range(0, 4):
         add = 3 * factor
@@ -28,8 +28,15 @@ def get_square(data, square):
         add = 27 + 3 * factor
     elif square in range(7, 10):
         add = 54 + 3 * factor
-
     return data[add + 0: add + 3] + data[add + 9: add + 12] + data[add + 18: add + 21]
+
+
+def get_row(count):
+    return int(count / 9) + 1
+
+
+def get_column(count):
+    return count % 9 + 1
 
 
 class SudokuTests(unittest.TestCase):
@@ -52,65 +59,83 @@ class SudokuTests(unittest.TestCase):
     def test_read_xlsx_return_sample(self):
         self.assertEqual(read_xlsx(r'2021-11-23.xlsx'), self.sample_data)
 
-    def test_get_row_return_something(self):
-        self.assertIsNotNone(get_row(self.sample_data, 1))
+    def test_get_row_values_return_something(self):
+        self.assertIsNotNone(get_row_values(self.sample_data, 1))
 
-    def test_get_row_return_9_numbers(self):
-        self.assertEqual(len(get_row(self.sample_data, 1)), 9)
+    def test_get_row_values_return_9_numbers(self):
+        self.assertEqual(len(get_row_values(self.sample_data, 1)), 9)
 
-    def test_get_row_return_part_of_sample(self):
-        self.assertEqual(get_row(self.sample_data, 1), self.sample_data[0:9])
-        self.assertEqual(get_row(self.sample_data, 2), self.sample_data[9:18])
-        self.assertEqual(get_row(self.sample_data, 3), self.sample_data[18:27])
-        self.assertEqual(get_row(self.sample_data, 4), self.sample_data[27:36])
-        self.assertEqual(get_row(self.sample_data, 5), self.sample_data[36:45])
-        self.assertEqual(get_row(self.sample_data, 6), self.sample_data[45:54])
-        self.assertEqual(get_row(self.sample_data, 7), self.sample_data[54:63])
-        self.assertEqual(get_row(self.sample_data, 8), self.sample_data[63:72])
-        self.assertEqual(get_row(self.sample_data, 9), self.sample_data[72:81])
+    def test_get_row_values_return_part_of_sample(self):
+        self.assertEqual(get_row_values(self.sample_data, 1), self.sample_data[0:9])
+        self.assertEqual(get_row_values(self.sample_data, 2), self.sample_data[9:18])
+        self.assertEqual(get_row_values(self.sample_data, 3), self.sample_data[18:27])
+        self.assertEqual(get_row_values(self.sample_data, 4), self.sample_data[27:36])
+        self.assertEqual(get_row_values(self.sample_data, 5), self.sample_data[36:45])
+        self.assertEqual(get_row_values(self.sample_data, 6), self.sample_data[45:54])
+        self.assertEqual(get_row_values(self.sample_data, 7), self.sample_data[54:63])
+        self.assertEqual(get_row_values(self.sample_data, 8), self.sample_data[63:72])
+        self.assertEqual(get_row_values(self.sample_data, 9), self.sample_data[72:81])
 
-    def test_get_column_return_something(self):
-        self.assertIsNotNone(get_column(self.sample_data, 1))
+    def test_get_column_values_return_something(self):
+        self.assertIsNotNone(get_column_values(self.sample_data, 1))
 
-    def test_get_column_return_9_numbers(self):
-        self.assertEqual(len(get_column(self.sample_data, 1)), 9)
+    def test_get_column_values_return_9_numbers(self):
+        self.assertEqual(len(get_column_values(self.sample_data, 1)), 9)
 
-    def test_get_column_return_part_of_sample(self):
-        self.assertEqual(get_column(self.sample_data, 1), self.sample_data[0:81:9])
-        self.assertEqual(get_column(self.sample_data, 2), self.sample_data[1:81:9])
-        self.assertEqual(get_column(self.sample_data, 3), self.sample_data[2:81:9])
-        self.assertEqual(get_column(self.sample_data, 4), self.sample_data[3:81:9])
-        self.assertEqual(get_column(self.sample_data, 5), self.sample_data[4:81:9])
-        self.assertEqual(get_column(self.sample_data, 6), self.sample_data[5:81:9])
-        self.assertEqual(get_column(self.sample_data, 7), self.sample_data[6:81:9])
-        self.assertEqual(get_column(self.sample_data, 8), self.sample_data[7:81:9])
-        self.assertEqual(get_column(self.sample_data, 9), self.sample_data[8:81:9])
+    def test_get_column_values_return_part_of_sample(self):
+        self.assertEqual(get_column_values(self.sample_data, 1), self.sample_data[0:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 2), self.sample_data[1:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 3), self.sample_data[2:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 4), self.sample_data[3:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 5), self.sample_data[4:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 6), self.sample_data[5:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 7), self.sample_data[6:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 8), self.sample_data[7:81:9])
+        self.assertEqual(get_column_values(self.sample_data, 9), self.sample_data[8:81:9])
 
-    def test_get_square_return_something(self):
-        self.assertIsNotNone(get_square(self.sample_data, 1))
+    def test_get_square_values_return_something(self):
+        self.assertIsNotNone(get_square_values(self.sample_data, 1))
 
-    def test_get_square_return_9_numbers(self):
-        self.assertEqual(len(get_square(self.sample_data, 1)), 9)
+    def test_get_square_values_return_9_numbers(self):
+        self.assertEqual(len(get_square_values(self.sample_data, 1)), 9)
 
-    def test_get_square_return_part_of_sample(self):
-        self.assertEqual(get_square(self.sample_data, 1),
+    def test_get_square_values_return_part_of_sample(self):
+        self.assertEqual(get_square_values(self.sample_data, 1),
                          self.sample_data[0:3] + self.sample_data[9:12] + self.sample_data[18:21])
-        self.assertEqual(get_square(self.sample_data, 2),
+        self.assertEqual(get_square_values(self.sample_data, 2),
                          self.sample_data[3:6] + self.sample_data[12:15] + self.sample_data[21:24])
-        self.assertEqual(get_square(self.sample_data, 3),
+        self.assertEqual(get_square_values(self.sample_data, 3),
                          self.sample_data[6:9] + self.sample_data[15:18] + self.sample_data[24:27])
-        self.assertEqual(get_square(self.sample_data, 4),
+        self.assertEqual(get_square_values(self.sample_data, 4),
                          self.sample_data[27:30] + self.sample_data[36:39] + self.sample_data[45:48])
-        self.assertEqual(get_square(self.sample_data, 5),
+        self.assertEqual(get_square_values(self.sample_data, 5),
                          self.sample_data[30:33] + self.sample_data[39:42] + self.sample_data[48:51])
-        self.assertEqual(get_square(self.sample_data, 6),
+        self.assertEqual(get_square_values(self.sample_data, 6),
                          self.sample_data[33:36] + self.sample_data[42:45] + self.sample_data[51:54])
-        self.assertEqual(get_square(self.sample_data, 7),
+        self.assertEqual(get_square_values(self.sample_data, 7),
                          self.sample_data[54:57] + self.sample_data[63:66] + self.sample_data[72:75])
-        self.assertEqual(get_square(self.sample_data, 8),
+        self.assertEqual(get_square_values(self.sample_data, 8),
                          self.sample_data[57:60] + self.sample_data[66:69] + self.sample_data[75:78])
-        self.assertEqual(get_square(self.sample_data, 9),
+        self.assertEqual(get_square_values(self.sample_data, 9),
                          self.sample_data[60:63] + self.sample_data[69:72] + self.sample_data[78:81])
+
+    def test_get_row(self):
+        self.assertEqual(get_row(0), 1)
+        self.assertEqual(get_row(8), 1)
+        self.assertEqual(get_row(9), 2)
+        self.assertEqual(get_row(17), 2)
+        self.assertEqual(get_row(18), 3)
+        self.assertEqual(get_row(80), 9)
+
+    def test_get_column(self):
+        self.assertEqual(get_column(0), 1)
+        self.assertEqual(get_column(1), 2)
+        self.assertEqual(get_column(7), 8)
+        self.assertEqual(get_column(8), 9)
+        self.assertEqual(get_column(9), 1)
+        self.assertEqual(get_column(17), 9)
+        self.assertEqual(get_column(18), 1)
+        self.assertEqual(get_column(80), 9)
 
 
 if __name__ == '__main__':
