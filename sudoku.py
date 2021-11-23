@@ -21,7 +21,15 @@ def get_column(data, column):
 
 
 def get_square(data, square):
-    return data[0:3] + data[9:12] + data[18:21]
+    factor = (square + 2) % 3
+    if square in range(0, 4):
+        add = 3 * factor
+    elif square in range(4, 7):
+        add = 27 + 3 * factor
+    elif square in range(7, 10):
+        add = 54 + 3 * factor
+
+    return data[add + 0: add + 3] + data[add + 9: add + 12] + data[add + 18: add + 21]
 
 
 class SudokuTests(unittest.TestCase):
