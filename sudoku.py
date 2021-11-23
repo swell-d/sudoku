@@ -13,7 +13,7 @@ def read_xlsx(filename):
 
 
 def get_line(data, line):
-    return [None] * 9
+    return data[9 * line - 9: 9 * line]
 
 
 class SudokuTests(unittest.TestCase):
@@ -41,6 +41,17 @@ class SudokuTests(unittest.TestCase):
 
     def test_get_line_return_9_numbers(self):
         self.assertEqual(len(get_line(self.sample_data, 1)), 9)
+
+    def test_get_line_return_part_of_sample(self):
+        self.assertEqual(get_line(self.sample_data, 1), self.sample_data[0:9])
+        self.assertEqual(get_line(self.sample_data, 2), self.sample_data[9:18])
+        self.assertEqual(get_line(self.sample_data, 3), self.sample_data[18:27])
+        self.assertEqual(get_line(self.sample_data, 4), self.sample_data[27:36])
+        self.assertEqual(get_line(self.sample_data, 5), self.sample_data[36:45])
+        self.assertEqual(get_line(self.sample_data, 6), self.sample_data[45:54])
+        self.assertEqual(get_line(self.sample_data, 7), self.sample_data[54:63])
+        self.assertEqual(get_line(self.sample_data, 8), self.sample_data[63:72])
+        self.assertEqual(get_line(self.sample_data, 9), self.sample_data[72:81])
 
 
 if __name__ == '__main__':
