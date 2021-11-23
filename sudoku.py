@@ -39,6 +39,10 @@ def get_column(count):
     return count % 9 + 1
 
 
+def get_square(count):
+    return int(count / 27) * 3 + int((get_column(count) + 2) / 3)
+
+
 class SudokuTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
                    5, None, 4, None, 2, None, None, 1, None,
@@ -137,6 +141,33 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_column(18), 1)
         self.assertEqual(get_column(80), 9)
 
+    def test_get_square(self):
+        self.assertEqual(get_square(0), 1)
+        self.assertEqual(get_square(1), 1)
+        self.assertEqual(get_square(2), 1)
+        self.assertEqual(get_square(9), 1)
+        self.assertEqual(get_square(10), 1)
+        self.assertEqual(get_square(11), 1)
+        self.assertEqual(get_square(18), 1)
+        self.assertEqual(get_square(19), 1)
+        self.assertEqual(get_square(20), 1)
+        self.assertEqual(get_square(30), 5)
+        self.assertEqual(get_square(40), 5)
+        self.assertEqual(get_square(50), 5)
+        self.assertEqual(get_square(60), 9)
+        self.assertEqual(get_square(70), 9)
+        self.assertEqual(get_square(80), 9)
+
 
 if __name__ == '__main__':
     unittest.main()
+
+#   0   1	2	3	4	5	6	7	8
+#   9   10	11	12	13	14	15	16	17
+#   18	19	20	21	22	23	24	25	26
+#   27	28	29	30	31	32	33	34	35
+#   36	37	38	39	40	41	42	43	44
+#   45	46	47	48	49	50	51	52	53
+#   54	55	56	57	58	59	60	61	62
+#   63	64	65	66	67	68	69	70	71
+#   72	73	74	75	76	77	78	79	80
