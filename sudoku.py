@@ -22,12 +22,11 @@ def get_column_values(data, column):
 
 def get_square_values(data, square):
     factor = (square + 2) % 3
-    if square in range(0, 4):
-        add = 3 * factor
-    elif square in range(4, 7):
-        add = 27 + 3 * factor
-    elif square in range(7, 10):
-        add = 54 + 3 * factor
+    add = 3 * factor
+    if square in [4, 5, 6]:
+        add += 27
+    elif square in [7, 8, 9]:
+        add += 54
     return data[add + 0: add + 3] + data[add + 9: add + 12] + data[add + 18: add + 21]
 
 
@@ -46,6 +45,9 @@ def get_square(count):
 def find_options(data):
     result = []
     for count, value in enumerate(data):
+        if value is not None:
+            result.append(value)
+            continue
         options = [i for i in range(1, 10)]
         for i in range(1, 10):
             if i in get_row_values(data, get_row(count)) or i in get_column_values(data, get_column(count)) or i in get_square_values(data, get_square(count)):
