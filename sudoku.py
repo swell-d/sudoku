@@ -71,7 +71,7 @@ def get_square(count):
     return int(count / 27) * 3 + int((get_column(count) + 2) / 3)
 
 
-def find_options(data):
+def find_options1(data):
     result = []
     for count, value in enumerate(data):
         if value is not None:
@@ -84,7 +84,6 @@ def find_options(data):
                     i in get_square_values(data, get_square(count)):
                 options.remove(i)
         result.append(options)
-    # print_data(result)
     return result
 
 
@@ -100,7 +99,6 @@ def find_options2(data):
                 options.append(0)
             else:
                 options.append(i)
-        # print_data(options)
         result.append(options)
     return result
 
@@ -122,8 +120,7 @@ def return_count_from_square(square, i):
     return add + (square + 2) % 3 * 3 + int((i - 1) / 3) * 9 + (i - 1) % 3
 
 
-def find_answer1(data, options):
-    # print_data_81(data)
+def find_answer(data, options):
     for i, matrix in enumerate(options):
         for square_number in range(1, 10):
             square = get_square_values(matrix, square_number)
@@ -131,8 +128,6 @@ def find_answer1(data, options):
             if answer_in_square:
                 count = return_count_from_square(square_number, answer_in_square)
                 data[count] = i + 1
-                print(f'square {square_number} - pos {answer_in_square} - #{i + 1}')
-                # print_data_81(data)
     return data
 
 
@@ -257,8 +252,8 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_square(70), 9)
         self.assertEqual(get_square(80), 9)
 
-    def test_find_options(self):
-        self.assertEqual(find_options(self.sample_data.copy()),
+    def test_find_options1(self):
+        self.assertEqual(find_options1(self.sample_data.copy()),
                          [[2, 6, 9], [2, 7, 9], [2, 6, 7], [4, 5, 6, 7], [3, 4, 5, 6], 1, [3, 6, 7, 9], 8,
                           [3, 4, 6, 7, 9], 5, [7, 9], 4, [6, 7, 8], 2, [6, 7, 8, 9], [3, 6, 7, 9], 1, [3, 6, 7, 9],
                           [1, 6, 8, 9], [1, 7, 9], 3, [4, 6, 7, 8], [4, 6, 8], [4, 6, 7, 8, 9], 2, 5, [4, 6, 7, 9], 4,
@@ -329,12 +324,14 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(return_count_from_square(7, 7), 72)
         self.assertEqual(return_count_from_square(9, 9), 80)
 
-    def test_find_answer1(self):
-        new_data = find_answer1(self.sample_data.copy(), find_options2(self.sample_data.copy()))
-        print(' ')
-        for _ in range(30):
-            new_data = find_answer1(new_data, find_options2(new_data))
-            print('-')
+    def test_find_answer(self):
+        new_data = find_answer(self.sample_data.copy(), find_options2(self.sample_data.copy()))
+        for _ in range(12):
+            new_data = find_answer(new_data, find_options2(new_data))
+        self.assertEqual(new_data,
+                         [6, 2, 7, 5, 3, 1, 9, 8, 4, 5, 9, 4, 8, 2, 7, 6, 1, 3, 8, 1, 3, 6, 4, 9, 2, 5, 7, 4, 5, 1, 9,
+                          6, 2, 3, 7, 8, 7, 3, 6, 1, 8, 5, 4, 2, 9, 9, 8, 2, 3, 7, 4, 5, 6, 1, 1, 7, 5, 4, 9, 6, 8, 3,
+                          2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5])
 
 
 if __name__ == '__main__':
