@@ -21,6 +21,9 @@ def get_column_values(data, column):
 
 
 def get_square_values(data, square):
+    #   1   2	3
+    #   4   5	6
+    #   7	8	9
     factor = (square + 2) % 3
     add = 3 * factor
     if square in [4, 5, 6]:
