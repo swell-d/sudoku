@@ -120,8 +120,8 @@ def return_count_from_square(square, i):
     return add + (square + 2) % 3 * 3 + int((i - 1) / 3) * 9 + (i - 1) % 3
 
 
-def find_answer(data, options):
-    for i, matrix in enumerate(options):
+def find_answer(data):
+    for i, matrix in enumerate(find_options2(data)):
         for square_number in range(1, 10):
             square = get_square_values(matrix, square_number)
             answer_in_square = check_answer_in_square(square)
@@ -325,17 +325,13 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(return_count_from_square(9, 9), 80)
 
     def test_find_answer(self):
-        new_data = find_answer(self.sample_data.copy(), find_options2(self.sample_data.copy()))
+        new_data = find_answer(self.sample_data.copy())
         for _ in range(12):
-            new_data = find_answer(new_data, find_options2(new_data))
+            new_data = find_answer(new_data)
         self.assertEqual(new_data,
                          [6, 2, 7, 5, 3, 1, 9, 8, 4, 5, 9, 4, 8, 2, 7, 6, 1, 3, 8, 1, 3, 6, 4, 9, 2, 5, 7, 4, 5, 1, 9,
                           6, 2, 3, 7, 8, 7, 3, 6, 1, 8, 5, 4, 2, 9, 9, 8, 2, 3, 7, 4, 5, 6, 1, 1, 7, 5, 4, 9, 6, 8, 3,
                           2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5])
-
-
-if __name__ == '__main__':
-    unittest.main()
 
 #   0   1	2	3	4	5	6	7	8
 #   9   10	11	12	13	14	15	16	17
