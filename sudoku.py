@@ -105,20 +105,6 @@ def find_options2(data):
     return result
 
 
-def find_answer1(data, options):
-    print_data_81(data)
-    for i, matrix in enumerate(options):
-        for square_number in range(1, 10):
-            square = get_square_values(matrix, square_number)
-            answer_in_square = check_answer_in_square(square)
-            if answer_in_square:
-                count = return_count_from_square(square_number, answer_in_square)
-                data[count] = i + 1
-                print(f'#{i + 1} - {square_number} - {answer_in_square}')
-                print_data_81(data)
-    return data
-
-
 def check_answer_in_square(square):
     if square.count(0) == 8:
         for i in range(0, 9):
@@ -134,6 +120,20 @@ def return_count_from_square(square, i):
     elif square in [7, 8, 9]:
         add += 54
     return add + (square + 2) % 3 * 3 + int((i - 1) / 3) * 9 + (i - 1) % 3
+
+
+def find_answer1(data, options):
+    # print_data_81(data)
+    for i, matrix in enumerate(options):
+        for square_number in range(1, 10):
+            square = get_square_values(matrix, square_number)
+            answer_in_square = check_answer_in_square(square)
+            if answer_in_square:
+                count = return_count_from_square(square_number, answer_in_square)
+                data[count] = i + 1
+                print(f'square {square_number} - pos {answer_in_square} - #{i + 1}')
+                # print_data_81(data)
+    return data
 
 
 class SudokuTests(unittest.TestCase):
@@ -204,17 +204,23 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_square_values(self.sample_data.copy(), 3),
                          self.sample_data.copy()[6:9] + self.sample_data.copy()[15:18] + self.sample_data.copy()[24:27])
         self.assertEqual(get_square_values(self.sample_data.copy(), 4),
-                         self.sample_data.copy()[27:30] + self.sample_data.copy()[36:39] + self.sample_data.copy()[45:48])
+                         self.sample_data.copy()[27:30] + self.sample_data.copy()[36:39] + self.sample_data.copy()[
+                                                                                           45:48])
         self.assertEqual(get_square_values(self.sample_data.copy(), 5),
-                         self.sample_data.copy()[30:33] + self.sample_data.copy()[39:42] + self.sample_data.copy()[48:51])
+                         self.sample_data.copy()[30:33] + self.sample_data.copy()[39:42] + self.sample_data.copy()[
+                                                                                           48:51])
         self.assertEqual(get_square_values(self.sample_data.copy(), 6),
-                         self.sample_data.copy()[33:36] + self.sample_data.copy()[42:45] + self.sample_data.copy()[51:54])
+                         self.sample_data.copy()[33:36] + self.sample_data.copy()[42:45] + self.sample_data.copy()[
+                                                                                           51:54])
         self.assertEqual(get_square_values(self.sample_data.copy(), 7),
-                         self.sample_data.copy()[54:57] + self.sample_data.copy()[63:66] + self.sample_data.copy()[72:75])
+                         self.sample_data.copy()[54:57] + self.sample_data.copy()[63:66] + self.sample_data.copy()[
+                                                                                           72:75])
         self.assertEqual(get_square_values(self.sample_data.copy(), 8),
-                         self.sample_data.copy()[57:60] + self.sample_data.copy()[66:69] + self.sample_data.copy()[75:78])
+                         self.sample_data.copy()[57:60] + self.sample_data.copy()[66:69] + self.sample_data.copy()[
+                                                                                           75:78])
         self.assertEqual(get_square_values(self.sample_data.copy(), 9),
-                         self.sample_data.copy()[60:63] + self.sample_data.copy()[69:72] + self.sample_data.copy()[78:81])
+                         self.sample_data.copy()[60:63] + self.sample_data.copy()[69:72] + self.sample_data.copy()[
+                                                                                           78:81])
 
     def test_get_row(self):
         self.assertEqual(get_row(0), 1)
@@ -263,54 +269,52 @@ class SudokuTests(unittest.TestCase):
                           [2, 4, 7, 8], [1, 4, 8], [2, 4, 7, 8], [1, 3, 7], [3, 4, 7], 5])
 
     def test_find_options2(self):
-        self.assertEqual(find_options2(self.sample_data.copy()), [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-                                                            0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
-                                                            0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
-                                                            0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0,
-                                                            0], [
-                                                               2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 2,
-                                                               0, 2, 0, 0, 0], [
-                                                               0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
-                                                               0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0,
-                                                               0, 0, 3, 3, 0], [
-                                                               0, 0, 0, 4, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 4, 4, 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
-                                                               4, 0, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4,
-                                                               4, 4, 0, 4, 0], [
-                                                               0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5,
-                                                               5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0], [
-                                                               6, 0, 6, 6, 6, 0, 6, 0, 6, 0, 0, 0, 6, 0, 6, 6, 0, 6, 6,
-                                                               0, 0, 6, 6, 6, 0, 0, 6, 0, 0, 6, 0, 6, 6, 6, 6, 6, 0, 0,
-                                                               6, 0, 6, 0, 0, 0, 6, 6, 0, 6, 0, 0, 6, 6, 6, 6, 0, 0, 0,
-                                                               6, 0, 6, 0, 6, 0, 0, 0, 0, 6, 6, 0, 6, 6, 6, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0], [
-                                                               0, 7, 7, 7, 0, 0, 7, 0, 7, 0, 7, 0, 7, 0, 7, 7, 0, 7, 0,
-                                                               7, 0, 7, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7,
-                                                               7, 0, 7, 0, 7, 0, 0, 0, 0, 7, 0, 0, 7, 7, 7, 0, 0, 0, 7,
-                                                               0, 7, 7, 7, 0], [
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 0, 0, 8,
-                                                               0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 8, 0, 0,
-                                                               0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8,
-                                                               8, 8, 0, 0, 0], [
-                                                               9, 9, 0, 0, 0, 0, 9, 0, 9, 0, 9, 0, 0, 0, 9, 9, 0, 9, 9,
-                                                               9, 0, 0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0,
-                                                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0,
-                                                               0, 0, 0, 0, 0]])
-
-    def test_find_answer1(self):
-        self.assertIsNotNone(find_answer1(self.sample_data.copy(), find_options2(self.sample_data.copy())))
+        self.assertEqual(find_options2(self.sample_data.copy()),
+                         [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+                           0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
+                           0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
+                           0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0,
+                           0], [
+                              2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 2,
+                              0, 2, 0, 0, 0], [
+                              0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
+                              0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0,
+                              0, 0, 3, 3, 0], [
+                              0, 0, 0, 4, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 4, 4, 4, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0,
+                              4, 0, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4,
+                              4, 4, 0, 4, 0], [
+                              0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 5,
+                              5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0], [
+                              6, 0, 6, 6, 6, 0, 6, 0, 6, 0, 0, 0, 6, 0, 6, 6, 0, 6, 6,
+                              0, 0, 6, 6, 6, 0, 0, 6, 0, 0, 6, 0, 6, 6, 6, 6, 6, 0, 0,
+                              6, 0, 6, 0, 0, 0, 6, 6, 0, 6, 0, 0, 6, 6, 6, 6, 0, 0, 0,
+                              6, 0, 6, 0, 6, 0, 0, 0, 0, 6, 6, 0, 6, 6, 6, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0], [
+                              0, 7, 7, 7, 0, 0, 7, 0, 7, 0, 7, 0, 7, 0, 7, 7, 0, 7, 0,
+                              7, 0, 7, 0, 7, 0, 0, 7, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 7,
+                              7, 0, 7, 0, 7, 0, 0, 0, 0, 7, 0, 0, 7, 7, 7, 0, 0, 0, 7,
+                              0, 7, 7, 7, 0], [
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 8, 0, 0, 0, 8,
+                              0, 0, 8, 8, 8, 0, 0, 0, 0, 0, 0, 0, 8, 8, 0, 0, 8, 0, 0,
+                              0, 0, 8, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8,
+                              8, 8, 0, 0, 0], [
+                              9, 9, 0, 0, 0, 0, 9, 0, 9, 0, 9, 0, 0, 0, 9, 9, 0, 9, 9,
+                              9, 0, 0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0]])
 
     def test_check_answer_in_square(self):
         self.assertFalse(check_answer_in_square([0, 0, 0, 0, 0, 0, 0, 0, 0]))
@@ -324,6 +328,13 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(return_count_from_square(5, 5), 40)
         self.assertEqual(return_count_from_square(7, 7), 72)
         self.assertEqual(return_count_from_square(9, 9), 80)
+
+    def test_find_answer1(self):
+        new_data = find_answer1(self.sample_data.copy(), find_options2(self.sample_data.copy()))
+        print(' ')
+        for _ in range(30):
+            new_data = find_answer1(new_data, find_options2(new_data))
+            print('-')
 
 
 if __name__ == '__main__':
