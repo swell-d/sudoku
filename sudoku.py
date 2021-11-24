@@ -106,11 +106,16 @@ def find_options2(data):
 
 
 def find_answer1(data, options):
-    print(options)
+    print_data_81(data)
     for i, matrix in enumerate(options):
-        for j in range(1, 10):
-            # print_data(matrix[0])
-            print_data_9(get_square_values(matrix, j))
+        for square_number in range(1, 10):
+            square = get_square_values(matrix, square_number)
+            answer_in_square = check_answer_in_square(square)
+            if answer_in_square:
+                count = return_count_from_square(square_number, answer_in_square)
+                data[count] = i + 1
+                print(f'#{i + 1} - {square_number} - {answer_in_square}')
+                print_data_81(data)
     return data
 
 
@@ -123,7 +128,12 @@ def check_answer_in_square(square):
 
 
 def return_count_from_square(square, i):
-    return (square - 1) * 9 + int((i - 1) / 3) * 3 + (i - 1) % 3
+    add = 0
+    if square in [4, 5, 6]:
+        add += 27
+    elif square in [7, 8, 9]:
+        add += 54
+    return add + (square + 2) % 3 * 3 + int((i - 1) / 3) * 9 + (i - 1) % 3
 
 
 class SudokuTests(unittest.TestCase):
@@ -144,67 +154,67 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(len(read_xlsx(r'2021-11-23.xlsx')), 81)
 
     def test_read_xlsx_return_sample(self):
-        self.assertEqual(read_xlsx(r'2021-11-23.xlsx'), self.sample_data)
+        self.assertEqual(read_xlsx(r'2021-11-23.xlsx'), self.sample_data.copy())
 
     def test_get_row_values_return_something(self):
-        self.assertIsNotNone(get_row_values(self.sample_data, 1))
+        self.assertIsNotNone(get_row_values(self.sample_data.copy(), 1))
 
     def test_get_row_values_return_9_numbers(self):
-        self.assertEqual(len(get_row_values(self.sample_data, 1)), 9)
+        self.assertEqual(len(get_row_values(self.sample_data.copy(), 1)), 9)
 
     def test_get_row_values_return_part_of_sample(self):
-        self.assertEqual(get_row_values(self.sample_data, 1), self.sample_data[0:9])
-        self.assertEqual(get_row_values(self.sample_data, 2), self.sample_data[9:18])
-        self.assertEqual(get_row_values(self.sample_data, 3), self.sample_data[18:27])
-        self.assertEqual(get_row_values(self.sample_data, 4), self.sample_data[27:36])
-        self.assertEqual(get_row_values(self.sample_data, 5), self.sample_data[36:45])
-        self.assertEqual(get_row_values(self.sample_data, 6), self.sample_data[45:54])
-        self.assertEqual(get_row_values(self.sample_data, 7), self.sample_data[54:63])
-        self.assertEqual(get_row_values(self.sample_data, 8), self.sample_data[63:72])
-        self.assertEqual(get_row_values(self.sample_data, 9), self.sample_data[72:81])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 1), self.sample_data.copy()[0:9])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 2), self.sample_data.copy()[9:18])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 3), self.sample_data.copy()[18:27])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 4), self.sample_data.copy()[27:36])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 5), self.sample_data.copy()[36:45])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 6), self.sample_data.copy()[45:54])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 7), self.sample_data.copy()[54:63])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 8), self.sample_data.copy()[63:72])
+        self.assertEqual(get_row_values(self.sample_data.copy(), 9), self.sample_data.copy()[72:81])
 
     def test_get_column_values_return_something(self):
-        self.assertIsNotNone(get_column_values(self.sample_data, 1))
+        self.assertIsNotNone(get_column_values(self.sample_data.copy(), 1))
 
     def test_get_column_values_return_9_numbers(self):
-        self.assertEqual(len(get_column_values(self.sample_data, 1)), 9)
+        self.assertEqual(len(get_column_values(self.sample_data.copy(), 1)), 9)
 
     def test_get_column_values_return_part_of_sample(self):
-        self.assertEqual(get_column_values(self.sample_data, 1), self.sample_data[0:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 2), self.sample_data[1:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 3), self.sample_data[2:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 4), self.sample_data[3:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 5), self.sample_data[4:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 6), self.sample_data[5:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 7), self.sample_data[6:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 8), self.sample_data[7:81:9])
-        self.assertEqual(get_column_values(self.sample_data, 9), self.sample_data[8:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 1), self.sample_data.copy()[0:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 2), self.sample_data.copy()[1:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 3), self.sample_data.copy()[2:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 4), self.sample_data.copy()[3:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 5), self.sample_data.copy()[4:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 6), self.sample_data.copy()[5:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 7), self.sample_data.copy()[6:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 8), self.sample_data.copy()[7:81:9])
+        self.assertEqual(get_column_values(self.sample_data.copy(), 9), self.sample_data.copy()[8:81:9])
 
     def test_get_square_values_return_something(self):
-        self.assertIsNotNone(get_square_values(self.sample_data, 1))
+        self.assertIsNotNone(get_square_values(self.sample_data.copy(), 1))
 
     def test_get_square_values_return_9_numbers(self):
-        self.assertEqual(len(get_square_values(self.sample_data, 1)), 9)
+        self.assertEqual(len(get_square_values(self.sample_data.copy(), 1)), 9)
 
     def test_get_square_values_return_part_of_sample(self):
-        self.assertEqual(get_square_values(self.sample_data, 1),
-                         self.sample_data[0:3] + self.sample_data[9:12] + self.sample_data[18:21])
-        self.assertEqual(get_square_values(self.sample_data, 2),
-                         self.sample_data[3:6] + self.sample_data[12:15] + self.sample_data[21:24])
-        self.assertEqual(get_square_values(self.sample_data, 3),
-                         self.sample_data[6:9] + self.sample_data[15:18] + self.sample_data[24:27])
-        self.assertEqual(get_square_values(self.sample_data, 4),
-                         self.sample_data[27:30] + self.sample_data[36:39] + self.sample_data[45:48])
-        self.assertEqual(get_square_values(self.sample_data, 5),
-                         self.sample_data[30:33] + self.sample_data[39:42] + self.sample_data[48:51])
-        self.assertEqual(get_square_values(self.sample_data, 6),
-                         self.sample_data[33:36] + self.sample_data[42:45] + self.sample_data[51:54])
-        self.assertEqual(get_square_values(self.sample_data, 7),
-                         self.sample_data[54:57] + self.sample_data[63:66] + self.sample_data[72:75])
-        self.assertEqual(get_square_values(self.sample_data, 8),
-                         self.sample_data[57:60] + self.sample_data[66:69] + self.sample_data[75:78])
-        self.assertEqual(get_square_values(self.sample_data, 9),
-                         self.sample_data[60:63] + self.sample_data[69:72] + self.sample_data[78:81])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 1),
+                         self.sample_data.copy()[0:3] + self.sample_data.copy()[9:12] + self.sample_data.copy()[18:21])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 2),
+                         self.sample_data.copy()[3:6] + self.sample_data.copy()[12:15] + self.sample_data.copy()[21:24])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 3),
+                         self.sample_data.copy()[6:9] + self.sample_data.copy()[15:18] + self.sample_data.copy()[24:27])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 4),
+                         self.sample_data.copy()[27:30] + self.sample_data.copy()[36:39] + self.sample_data.copy()[45:48])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 5),
+                         self.sample_data.copy()[30:33] + self.sample_data.copy()[39:42] + self.sample_data.copy()[48:51])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 6),
+                         self.sample_data.copy()[33:36] + self.sample_data.copy()[42:45] + self.sample_data.copy()[51:54])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 7),
+                         self.sample_data.copy()[54:57] + self.sample_data.copy()[63:66] + self.sample_data.copy()[72:75])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 8),
+                         self.sample_data.copy()[57:60] + self.sample_data.copy()[66:69] + self.sample_data.copy()[75:78])
+        self.assertEqual(get_square_values(self.sample_data.copy(), 9),
+                         self.sample_data.copy()[60:63] + self.sample_data.copy()[69:72] + self.sample_data.copy()[78:81])
 
     def test_get_row(self):
         self.assertEqual(get_row(0), 1)
@@ -242,7 +252,7 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_square(80), 9)
 
     def test_find_options(self):
-        self.assertEqual(find_options(self.sample_data),
+        self.assertEqual(find_options(self.sample_data.copy()),
                          [[2, 6, 9], [2, 7, 9], [2, 6, 7], [4, 5, 6, 7], [3, 4, 5, 6], 1, [3, 6, 7, 9], 8,
                           [3, 4, 6, 7, 9], 5, [7, 9], 4, [6, 7, 8], 2, [6, 7, 8, 9], [3, 6, 7, 9], 1, [3, 6, 7, 9],
                           [1, 6, 8, 9], [1, 7, 9], 3, [4, 6, 7, 8], [4, 6, 8], [4, 6, 7, 8, 9], 2, 5, [4, 6, 7, 9], 4,
@@ -253,7 +263,7 @@ class SudokuTests(unittest.TestCase):
                           [2, 4, 7, 8], [1, 4, 8], [2, 4, 7, 8], [1, 3, 7], [3, 4, 7], 5])
 
     def test_find_options2(self):
-        self.assertEqual(find_options2(self.sample_data), [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+        self.assertEqual(find_options2(self.sample_data.copy()), [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
                                                             0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0,
                                                             0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
                                                             0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1, 0,
@@ -300,7 +310,7 @@ class SudokuTests(unittest.TestCase):
                                                                0, 0, 0, 0, 0]])
 
     def test_find_answer1(self):
-        self.assertIsNotNone(find_answer1(self.sample_data, find_options2(self.sample_data)))
+        self.assertIsNotNone(find_answer1(self.sample_data.copy(), find_options2(self.sample_data.copy())))
 
     def test_check_answer_in_square(self):
         self.assertFalse(check_answer_in_square([0, 0, 0, 0, 0, 0, 0, 0, 0]))
@@ -310,7 +320,9 @@ class SudokuTests(unittest.TestCase):
     def test_return_count_from_square(self):
         self.assertEqual(return_count_from_square(1, 1), 0)
         self.assertEqual(return_count_from_square(1, 2), 1)
+        self.assertEqual(return_count_from_square(2, 2), 4)
         self.assertEqual(return_count_from_square(5, 5), 40)
+        self.assertEqual(return_count_from_square(7, 7), 72)
         self.assertEqual(return_count_from_square(9, 9), 80)
 
 
