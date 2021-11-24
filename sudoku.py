@@ -115,9 +115,10 @@ def find_answer1(data, options):
 
 
 def check_answer_in_square(square):
-    if square.count(0) != 8:
-        return False
-    return 1
+    if square.count(0) == 8:
+        square.sort()
+        return square[-1]
+    return False
 
 
 class SudokuTests(unittest.TestCase):
@@ -298,7 +299,7 @@ class SudokuTests(unittest.TestCase):
 
     def test_check_answer_in_square(self):
         self.assertFalse(check_answer_in_square([0, 0, 0, 0, 0, 0, 0, 0, 0]))
-        self.assertTrue(check_answer_in_square([1, 0, 0, 0, 0, 0, 0, 0, 0]))
+        self.assertEqual(check_answer_in_square([0, 5, 0, 0, 0, 0, 0, 0, 0]), 5)
 
 
 if __name__ == '__main__':
