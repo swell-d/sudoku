@@ -56,8 +56,9 @@ def find_options(data):
             continue
         options = [i for i in range(1, 10)]
         for i in range(1, 10):
-            if i in get_row_values(data, get_row(count)) or i in get_column_values(data, get_column(
-                    count)) or i in get_square_values(data, get_square(count)):
+            if i in get_row_values(data, get_row(count)) or \
+                    i in get_column_values(data, get_column(count)) or \
+                    i in get_square_values(data, get_square(count)):
                 options.remove(i)
         result.append(options)
     # print_data(result)
@@ -69,14 +70,13 @@ def find_options2(data):
     for i in range(1, 10):
         options = []
         for count, value in enumerate(data):
-            if value is not None or i in get_row_values(data, get_row(count)) or i in get_column_values(data,
-                                                                                                        get_column(
-                                                                                                                count)) or i in get_square_values(
-                    data, get_square(count)):
+            if value is not None or \
+                    i in get_row_values(data, get_row(count)) or \
+                    i in get_column_values(data, get_column(count)) or \
+                    i in get_square_values(data, get_square(count)):
                 options.append(0)
             else:
-                options.append(1)
-        print(i)
+                options.append(i)
         print_data(options)
         result.append([options])
     return result
@@ -86,12 +86,12 @@ def print_data(data):
     result = ''
     for i in range(0, 9):
         for j in range(0, 9):
-            result += str(data[i * 9 + j])
+            result += str(data[i * 9 + j]) + ' '
             if j in [2, 5]:
-                result += '|'
+                result += '| '
         result += '\n'
         if i in [2, 5]:
-            result += '-----------\n'
+            result += '------+-------+------\n'
     result += '\n'
     print(result)
 
