@@ -42,6 +42,9 @@ def get_column(count):
 
 
 def get_square(count):
+    #   1   2	3
+    #   4   5	6
+    #   7	8	9
     return int(count / 27) * 3 + int((get_column(count) + 2) / 3)
 
 
@@ -53,12 +56,44 @@ def find_options(data):
             continue
         options = [i for i in range(1, 10)]
         for i in range(1, 10):
-            if i in get_row_values(data, get_row(count)) or i in get_column_values(data, get_column(count)) or i in get_square_values(data, get_square(count)):
+            if i in get_row_values(data, get_row(count)) or i in get_column_values(data, get_column(
+                    count)) or i in get_square_values(data, get_square(count)):
                 options.remove(i)
         result.append(options)
-    print(result)
+    # print_data(result)
     return result
 
+
+def find_options2(data):
+    result = []
+    for i in range(1, 10):
+        options = []
+        for count, value in enumerate(data):
+            if value is not None or i in get_row_values(data, get_row(count)) or i in get_column_values(data,
+                                                                                                        get_column(
+                                                                                                                count)) or i in get_square_values(
+                    data, get_square(count)):
+                options.append(0)
+            else:
+                options.append(1)
+        print(i)
+        print_data(options)
+        result.append([options])
+    return result
+
+
+def print_data(data):
+    result = ''
+    for i in range(0, 9):
+        for j in range(0, 9):
+            result += str(data[i * 9 + j])
+            if j in [2, 5]:
+                result += '|'
+        result += '\n'
+        if i in [2, 5]:
+            result += '-----------\n'
+    result += '\n'
+    print(result)
 
 
 class SudokuTests(unittest.TestCase):
@@ -176,9 +211,11 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_square(70), 9)
         self.assertEqual(get_square(80), 9)
 
-
     def test_find_options(self):
         self.assertIsNotNone(find_options(self.sample_data))
+
+    def test_find_options2(self):
+        self.assertIsNotNone(find_options2(self.sample_data))
 
 
 if __name__ == '__main__':
