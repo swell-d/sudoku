@@ -118,8 +118,12 @@ def check_answer_in_square(square):
     if square.count(0) == 8:
         for i in range(0, 9):
             if square[i] != 0:
-                return i
+                return i + 1
     return False
+
+
+def return_count_from_square(square, i):
+    return (square - 1) * 9 + int((i - 1) / 3) * 3 + (i - 1) % 3
 
 
 class SudokuTests(unittest.TestCase):
@@ -300,8 +304,14 @@ class SudokuTests(unittest.TestCase):
 
     def test_check_answer_in_square(self):
         self.assertFalse(check_answer_in_square([0, 0, 0, 0, 0, 0, 0, 0, 0]))
-        self.assertEqual(check_answer_in_square([0, 5, 0, 0, 0, 0, 0, 0, 0]), 1)
-        self.assertEqual(check_answer_in_square([0, 0, 0, 0, 0, 0, 0, 0, 9]), 8)
+        self.assertEqual(check_answer_in_square([0, 5, 0, 0, 0, 0, 0, 0, 0]), 2)
+        self.assertEqual(check_answer_in_square([0, 0, 0, 0, 0, 0, 0, 0, 9]), 9)
+
+    def test_return_count_from_square(self):
+        self.assertEqual(return_count_from_square(1, 1), 0)
+        self.assertEqual(return_count_from_square(1, 2), 1)
+        self.assertEqual(return_count_from_square(5, 5), 40)
+        self.assertEqual(return_count_from_square(9, 9), 80)
 
 
 if __name__ == '__main__':
