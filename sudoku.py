@@ -3,6 +3,29 @@ import unittest
 import openpyxl as openpyxl
 
 
+def print_data_9(data):
+    result = ''
+    for i in range(0, 3):
+        for j in range(0, 3):
+            result += str(data[i * 3 + j]) + ' '
+        result += '\n'
+    print(result)
+
+
+def print_data_81(data):
+    result = ''
+    for i in range(0, 9):
+        for j in range(0, 9):
+            result += str(data[i * 9 + j]) + ' '
+            if j in [2, 5]:
+                result += '| '
+        result += '\n'
+        if i in [2, 5]:
+            result += '------+-------+------\n'
+    result += '\n'
+    print(result)
+
+
 def read_xlsx(filename):
     result = []
     sheet = openpyxl.load_workbook(filename).active
@@ -82,18 +105,11 @@ def find_options2(data):
     return result
 
 
-def print_data(data):
-    result = ''
-    for i in range(0, 9):
-        for j in range(0, 9):
-            result += str(data[i * 9 + j]) + ' '
-            if j in [2, 5]:
-                result += '| '
-        result += '\n'
-        if i in [2, 5]:
-            result += '------+-------+------\n'
-    result += '\n'
-    print(result)
+def find_answer1(data, options):
+    for i, matrix in enumerate(options):
+        # print_data(matrix[0])
+        print_data_9(get_square_values(matrix[0], 1))
+    return data
 
 
 class SudokuTests(unittest.TestCase):
@@ -268,6 +284,9 @@ class SudokuTests(unittest.TestCase):
                                                                 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0,
                                                                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0,
                                                                 0, 0, 0, 0, 0]]])
+
+    def test_find_answer1(self):
+        self.assertIsNotNone(find_answer1(self.sample_data, find_options2(self.sample_data)))
 
 
 if __name__ == '__main__':
