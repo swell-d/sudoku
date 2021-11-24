@@ -43,6 +43,19 @@ def get_square(count):
     return int(count / 27) * 3 + int((get_column(count) + 2) / 3)
 
 
+def find_options(data):
+    result = []
+    for count, value in enumerate(data):
+        options = [i for i in range(1, 10)]
+        for i in range(1, 10):
+            if i in get_row_values(data, get_row(count)) or i in get_column_values(data, get_column(count)) or i in get_square_values(data, get_square(count)):
+                options.remove(i)
+        result.append(options)
+    print(result)
+    return result
+
+
+
 class SudokuTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
                    5, None, 4, None, 2, None, None, 1, None,
@@ -157,6 +170,10 @@ class SudokuTests(unittest.TestCase):
         self.assertEqual(get_square(60), 9)
         self.assertEqual(get_square(70), 9)
         self.assertEqual(get_square(80), 9)
+
+
+    def test_find_options(self):
+        self.assertIsNotNone(find_options(self.sample_data))
 
 
 if __name__ == '__main__':
