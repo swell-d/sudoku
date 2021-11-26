@@ -72,6 +72,24 @@ class Field:
                 result.append(each.value)
         return result
 
+    def find_options1(self):
+        for each in self.field:
+            if each.value is not None:
+                each.options.append(each.value)
+                continue
+            each.options = [i for i in range(1, 10)]
+            for i in range(1, 10):
+                if i in self.get_row_values(each.row) or \
+                        i in self.get_column_values(each.column) or \
+                        i in self.get_square_values(each.square):
+                    each.options.remove(i)
+
+    def return_options(self):
+        result = []
+        for each in self.field:
+            result.append(each.options)
+        return result
+
 
 class FieldTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
@@ -179,6 +197,20 @@ class FieldTests(unittest.TestCase):
                          field.get_square_values(1))
         self.assertEqual(self.sample_data[60:63] + self.sample_data[69:72] + self.sample_data[78:81],
                          field.get_square_values(9))
+
+    def test_find_options1(self):
+        field = Field()
+        field.fill(self.sample_data)
+        field.find_options1()
+        self.assertEqual(
+            [[2, 6, 9], [2, 7, 9], [2, 6, 7], [4, 5, 6, 7], [3, 4, 5, 6], [1], [3, 6, 7, 9], [8], [3, 4, 6, 7, 9], [5],
+             [7, 9], [4], [6, 7, 8], [2], [6, 7, 8, 9], [3, 6, 7, 9], [1], [3, 6, 7, 9], [1, 6, 8, 9], [1, 7, 9], [3],
+             [4, 6, 7, 8], [4, 6, 8], [4, 6, 7, 8, 9], [2], [5], [4, 6, 7, 9], [4], [5], [1, 2, 6], [9], [6, 8],
+             [2, 6, 8], [1, 3, 6, 7], [3, 6, 7], [1, 3, 6, 7, 8], [7], [3], [6], [1], [6, 8], [5], [4], [2], [6, 8, 9],
+             [1, 2, 6, 9], [8], [1, 2, 6], [3], [7], [2, 4, 6], [1, 5, 6, 9], [6, 9], [1, 6, 9], [1, 3], [1, 7],
+             [1, 5, 7], [4, 5, 6, 7], [9], [4, 6, 7], [8], [3, 4, 6, 7], [2], [1, 2], [4], [8], [2, 5, 6, 7], [1, 5, 6],
+             [3], [1, 6, 7, 9], [6, 7, 9], [1, 6, 7, 9], [1, 2, 3], [6], [9], [2, 4, 7, 8], [1, 4, 8], [2, 4, 7, 8],
+             [1, 3, 7], [3, 4, 7], [5]], field.return_options())
 
 
 #   1   2	3
