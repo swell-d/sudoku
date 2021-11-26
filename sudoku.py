@@ -125,14 +125,19 @@ class Field:
                 return each.count
 
     def find_answer(self):
-        for value in range(1, 10):
-            matrix = self.find_options2(value)
-            for square_number in range(1, 10):
-                answer_in_square = self.check_answer_in_square(matrix, square_number)
-                if answer_in_square:
-                    self.cells[answer_in_square - 1].value = value
-                    # self.field[answer_in_square - 1].options = [value]
-        self.check_found()
+        i = 0
+        while self.found != 81 and i < 30:
+            i += 1
+            for value in range(1, 10):
+                matrix = self.find_options2(value)
+                for square_number in range(1, 10):
+                    answer_in_square = self.check_answer_in_square(matrix, square_number)
+                    if answer_in_square:
+                        self.cells[answer_in_square - 1].value = value
+                        # self.field[answer_in_square - 1].options = [value]
+            self.check_found()
+        self.print_field()
+        print(f'found with {i} steps')
 
     def check_found(self):
         result = 0
@@ -277,14 +282,13 @@ class FieldTests(unittest.TestCase):
 
     def test_find_answer(self):
         field = Field(self.sample_data)
-        for _ in range(12):
-            field.find_answer()
+        field.find_answer()
         self.assertEqual(
             [6, 2, 7, 5, 3, 1, 9, 8, 4, 5, 9, 4, 8, 2, 7, 6, 1, 3, 8, 1, 3, 6, 4, 9, 2, 5, 7, 4, 5, 1, 9,
              6, 2, 3, 7, 8, 7, 3, 6, 1, 8, 5, 4, 2, 9, 9, 8, 2, 3, 7, 4, 5, 6, 1, 1, 7, 5, 4, 9, 6, 8, 3,
              2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5], field.return_values())
 
-    def test_find_answer(self):
+    def test_check_found(self):
         field = Field(self.sample_data)
         self.assertEqual(30, field.found)
 
