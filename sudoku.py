@@ -14,6 +14,7 @@ class Cell:
 class Field:
     def __init__(self, data=None):
         self.cells = []
+        self.found = 0
         self.create_field()
         if data is not None:
             self.fill(data)
@@ -30,6 +31,7 @@ class Field:
     def fill(self, data):
         for i in range(81):
             self.cells[i].value = data[i]
+        self.check_found()
 
     def print_field(self):
         for each in self.cells:
@@ -46,6 +48,7 @@ class Field:
         sheet = openpyxl.load_workbook(filename).active
         for each in self.cells:
             each.value = sheet.cell(row=each.row, column=each.column).value
+        self.check_found()
 
     def return_values(self):
         result = []
@@ -129,6 +132,15 @@ class Field:
                 if answer_in_square:
                     self.cells[answer_in_square - 1].value = value
                     # self.field[answer_in_square - 1].options = [value]
+        self.check_found()
+
+    def check_found(self):
+        result = 0
+        for each in self.cells:
+            if each.value is None:
+                continue
+            result += 1
+        self.found = result
 
 
 class FieldTests(unittest.TestCase):
@@ -272,6 +284,9 @@ class FieldTests(unittest.TestCase):
              6, 2, 3, 7, 8, 7, 3, 6, 1, 8, 5, 4, 2, 9, 9, 8, 2, 3, 7, 4, 5, 6, 1, 1, 7, 5, 4, 9, 6, 8, 3,
              2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5], field.return_values())
 
+    def test_find_answer(self):
+        field = Field(self.sample_data)
+        self.assertEqual(30, field.found)
 
 #   1   2	3
 #   4   5	6
