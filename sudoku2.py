@@ -24,6 +24,16 @@ class Field:
                          column_number=column,
                          square=int((row - 1) / 3) * 3 + int((column - 1) / 3) + 1))
 
+    def print_data_81(self):
+        for each in self.field:
+            print(each.value if each.value is not None else '*', end=' ')
+            if each.column_number in [3, 6]:
+                print('|', end=' ')
+            if each.column_number == 9:
+                print('')
+            if each.column_number == 9 and each.row_number in [3, 6]:
+                print('------+-------+------')
+
 
 class FieldTests(unittest.TestCase):
     pass
@@ -31,3 +41,4 @@ class FieldTests(unittest.TestCase):
 
 A = Field()
 A.create_field()
+A.print_data_81()
