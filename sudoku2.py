@@ -90,6 +90,18 @@ class Field:
             result.append(each.options)
         return result
 
+    def find_options2(self, value):
+        result = []
+        for each in self.field:
+            if each.value is not None or \
+                    value in self.get_row_values(each.row) or \
+                    value in self.get_column_values(each.column) or \
+                    value in self.get_square_values(each.square):
+                result.append(0)
+            else:
+                result.append(value)
+        return result
+
 
 class FieldTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
@@ -211,6 +223,18 @@ class FieldTests(unittest.TestCase):
              [1, 5, 7], [4, 5, 6, 7], [9], [4, 6, 7], [8], [3, 4, 6, 7], [2], [1, 2], [4], [8], [2, 5, 6, 7], [1, 5, 6],
              [3], [1, 6, 7, 9], [6, 7, 9], [1, 6, 7, 9], [1, 2, 3], [6], [9], [2, 4, 7, 8], [1, 4, 8], [2, 4, 7, 8],
              [1, 3, 7], [3, 4, 7], [5]], field.return_options())
+
+    def test_find_options2(self):
+        field = Field()
+        field.fill(self.sample_data)
+        self.assertEqual(
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1,
+             1, 0, 0, 0, 1, 0, 1, 0, 0], field.find_options2(1))
+        self.assertEqual(
+            [9, 9, 0, 0, 0, 0, 9, 0, 9, 0, 9, 0, 0, 0, 9, 9, 0, 9, 9, 9, 0, 0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9,
+             0, 0, 0, 0, 0, 0, 0, 0, 0], field.find_options2(9))
 
 
 #   1   2	3
