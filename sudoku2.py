@@ -65,6 +65,13 @@ class Field:
                 result.append(each.value)
         return result
 
+    def get_square_cells(self, square):
+        result = []
+        for each in self.field:
+            if each.square == square:
+                result.append(each)
+        return result
+
     def get_square_values(self, square):
         result = []
         for each in self.field:
@@ -101,6 +108,16 @@ class Field:
             else:
                 result.append(value)
         return result
+
+    @staticmethod
+    def check_answer_in_square(matrix_values, square):
+        matrix = Field()
+        matrix.fill(matrix_values)
+        if matrix.get_square_values(square).count(0) != 8:
+            return False
+        for each in matrix.get_square_cells(square):
+            if each.value != 0:
+                return each.count
 
 
 class FieldTests(unittest.TestCase):
@@ -235,6 +252,16 @@ class FieldTests(unittest.TestCase):
             [9, 9, 0, 0, 0, 0, 9, 0, 9, 0, 9, 0, 0, 0, 9, 9, 0, 9, 9, 9, 0, 0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9,
              0, 0, 0, 0, 0, 0, 0, 0, 0], field.find_options2(9))
+
+    def test_check_answer_in_square(self):
+        self.assertFalse(Field().check_answer_in_square(
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0], 1))
+        self.assertEqual(2, Field().check_answer_in_square(
+            [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+             0, 0, 0, 0, 0, 0, 0, 0, 0], 1))
 
 
 #   1   2	3
