@@ -58,6 +58,13 @@ class Field:
                 result.append(each.value)
         return result
 
+    def get_column_values(self, column):
+        result = []
+        for each in self.field:
+            if each.column == column:
+                result.append(each.value)
+        return result
+
 
 class FieldTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
@@ -129,9 +136,24 @@ class FieldTests(unittest.TestCase):
     def test_get_row_values_return_part_of_sample(self):
         field = Field()
         field.fill(self.sample_data)
-        field.print_data_81()
         self.assertEqual(self.sample_data[0:9], field.get_row_values(1))
         self.assertEqual(self.sample_data[72:81], field.get_row_values(9))
+
+    def test_get_column_values_return_something(self):
+        field = Field()
+        field.fill(self.sample_data)
+        self.assertIsNotNone(field.get_column_values(1))
+
+    def test_get_column_values_return_9_numbers(self):
+        field = Field()
+        field.fill(self.sample_data)
+        self.assertEqual(9, len(field.get_column_values(1)))
+
+    def test_get_column_values_return_part_of_sample(self):
+        field = Field()
+        field.fill(self.sample_data)
+        self.assertEqual(self.sample_data[0:81:9], field.get_column_values(1))
+        self.assertEqual(self.sample_data[8:81:9], field.get_column_values(9))
 
 
 # 1  2  3  | 4  5  6  | 7  8  9
