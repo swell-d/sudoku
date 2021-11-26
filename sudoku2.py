@@ -25,11 +25,9 @@ class Field:
                          column=column,
                          square=int((row - 1) / 3) * 3 + int((column - 1) / 3) + 1))
 
-    def return_values(self):
-        result = []
-        for each in self.field:
-            result.append(each.value)
-        return result
+    def fill(self, data):
+        for i in range(81):
+            self.field[i].value = data[i]
 
     def print_data_81(self):
         for each in self.field:
@@ -46,6 +44,19 @@ class Field:
         sheet = openpyxl.load_workbook(filename).active
         for each in self.field:
             each.value = sheet.cell(row=each.row, column=each.column).value
+
+    def return_values(self):
+        result = []
+        for each in self.field:
+            result.append(each.value)
+        return result
+
+    def get_row_values(self, row):
+        result = []
+        for each in self.field:
+            if each.row == row:
+                result.append(each.value)
+        return result
 
 
 class FieldTests(unittest.TestCase):
@@ -104,6 +115,23 @@ class FieldTests(unittest.TestCase):
         field = Field()
         field.read_xlsx(r'2021-11-23.xlsx')
         self.assertEqual(self.sample_data.copy(), field.return_values())
+
+    def test_get_row_values_return_something(self):
+        field = Field()
+        field.fill(self.sample_data)
+        self.assertIsNotNone(field.get_row_values(1))
+
+    def test_get_row_values_return_9_numbers(self):
+        field = Field()
+        field.fill(self.sample_data)
+        self.assertEqual(9, len(field.get_row_values(1)))
+
+    def test_get_row_values_return_part_of_sample(self):
+        field = Field()
+        field.fill(self.sample_data)
+        field.print_data_81()
+        self.assertEqual(self.sample_data[0:9], field.get_row_values(1))
+        self.assertEqual(self.sample_data[72:81], field.get_row_values(9))
 
 
 # 1  2  3  | 4  5  6  | 7  8  9
