@@ -119,6 +119,15 @@ class Field:
             if each.value != 0:
                 return each.count
 
+    def find_answer(self):
+        for value in range(1, 10):
+            matrix = self.find_options2(value)
+            for square_number in range(1, 10):
+                answer_in_square = self.check_answer_in_square(matrix, square_number)
+                if answer_in_square:
+                    self.field[answer_in_square - 1].value = value
+                    # self.field[answer_in_square - 1].options = [value]
+
 
 class FieldTests(unittest.TestCase):
     sample_data = [None, None, None, None, None, 1, None, 8, None,
@@ -263,10 +272,21 @@ class FieldTests(unittest.TestCase):
              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0], 1))
 
+    def test_find_answer(self):
+        field = Field()
+        field.fill(self.sample_data)
+        for _ in range(12):
+            field.find_answer()
+        self.assertEqual(
+            [6, 2, 7, 5, 3, 1, 9, 8, 4, 5, 9, 4, 8, 2, 7, 6, 1, 3, 8, 1, 3, 6, 4, 9, 2, 5, 7, 4, 5, 1, 9,
+             6, 2, 3, 7, 8, 7, 3, 6, 1, 8, 5, 4, 2, 9, 9, 8, 2, 3, 7, 4, 5, 6, 1, 1, 7, 5, 4, 9, 6, 8, 3,
+             2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5], field.return_values())
+
 
 #   1   2	3
 #   4   5	6
 #   7	8	9
+
 
 # 1  2  3  | 4  5  6  | 7  8  9
 # 10 11 12 | 13 14 15 | 16 17 18
