@@ -12,25 +12,27 @@ class Cell:
 
 
 class Field:
-    def __init__(self):
-        self.field = []
+    def __init__(self, data=None):
+        self.cells = []
         self.create_field()
+        if data is not None:
+            self.fill(data)
 
     def create_field(self):
         for row in range(1, 10):
             for column in range(1, 10):
-                self.field.append(
-                    Cell(count=len(self.field) + 1,
+                self.cells.append(
+                    Cell(count=len(self.cells) + 1,
                          row=row,
                          column=column,
                          square=int((row - 1) / 3) * 3 + int((column - 1) / 3) + 1))
 
     def fill(self, data):
         for i in range(81):
-            self.field[i].value = data[i]
+            self.cells[i].value = data[i]
 
     def print_field(self):
-        for each in self.field:
+        for each in self.cells:
             print(each.value if each.value is not None else '*', end=' ')
             if each.column in [3, 6]:
                 print('|', end=' ')
@@ -42,45 +44,45 @@ class Field:
     def read_xlsx(self, filename):
         import openpyxl
         sheet = openpyxl.load_workbook(filename).active
-        for each in self.field:
+        for each in self.cells:
             each.value = sheet.cell(row=each.row, column=each.column).value
 
     def return_values(self):
         result = []
-        for each in self.field:
+        for each in self.cells:
             result.append(each.value)
         return result
 
     def get_row_values(self, row):
         result = []
-        for each in self.field:
+        for each in self.cells:
             if each.row == row:
                 result.append(each.value)
         return result
 
     def get_column_values(self, column):
         result = []
-        for each in self.field:
+        for each in self.cells:
             if each.column == column:
                 result.append(each.value)
         return result
 
     def get_square_cells(self, square):
         result = []
-        for each in self.field:
+        for each in self.cells:
             if each.square == square:
                 result.append(each)
         return result
 
     def get_square_values(self, square):
         result = []
-        for each in self.field:
+        for each in self.cells:
             if each.square == square:
                 result.append(each.value)
         return result
 
     def find_options1(self):
-        for each in self.field:
+        for each in self.cells:
             if each.value is not None:
                 each.options.append(each.value)
                 continue
@@ -93,13 +95,13 @@ class Field:
 
     def return_options(self):
         result = []
-        for each in self.field:
+        for each in self.cells:
             result.append(each.options)
         return result
 
     def find_options2(self, value):
         result = []
-        for each in self.field:
+        for each in self.cells:
             if each.value is not None or \
                     value in self.get_row_values(each.row) or \
                     value in self.get_column_values(each.column) or \
@@ -125,7 +127,7 @@ class Field:
             for square_number in range(1, 10):
                 answer_in_square = self.check_answer_in_square(matrix, square_number)
                 if answer_in_square:
-                    self.field[answer_in_square - 1].value = value
+                    self.cells[answer_in_square - 1].value = value
                     # self.field[answer_in_square - 1].options = [value]
 
 
@@ -150,21 +152,21 @@ class FieldTests(unittest.TestCase):
 
     def test_field(self):
         field = Field()
-        cell = field.field[0]
+        cell = field.cells[0]
         self.assertEqual(1, cell.count)
         self.assertEqual(1, cell.row)
         self.assertEqual(1, cell.column)
         self.assertEqual(1, cell.square)
         self.assertEqual(None, cell.value)
 
-        cell = field.field[27]
+        cell = field.cells[27]
         self.assertEqual(28, cell.count)
         self.assertEqual(4, cell.row)
         self.assertEqual(1, cell.column)
         self.assertEqual(4, cell.square)
         self.assertEqual(None, cell.value)
 
-        cell = field.field[80]
+        cell = field.cells[80]
         self.assertEqual(81, cell.count)
         self.assertEqual(9, cell.row)
         self.assertEqual(9, cell.column)
@@ -187,58 +189,48 @@ class FieldTests(unittest.TestCase):
         self.assertEqual(self.sample_data.copy(), field.return_values())
 
     def test_get_row_values_return_something(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertIsNotNone(field.get_row_values(1))
 
     def test_get_row_values_return_9_numbers(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(9, len(field.get_row_values(1)))
 
     def test_get_row_values_return_part_of_sample(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(self.sample_data[0:9], field.get_row_values(1))
         self.assertEqual(self.sample_data[72:81], field.get_row_values(9))
 
     def test_get_column_values_return_something(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertIsNotNone(field.get_column_values(1))
 
     def test_get_column_values_return_9_numbers(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(9, len(field.get_column_values(1)))
 
     def test_get_column_values_return_part_of_sample(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(self.sample_data[0:81:9], field.get_column_values(1))
         self.assertEqual(self.sample_data[8:81:9], field.get_column_values(9))
 
     def test_get_square_values_return_something(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertIsNotNone(field.get_square_values(1))
 
     def test_get_square_values_return_9_numbers(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(9, len(field.get_square_values(1)))
 
     def test_get_square_values_return_part_of_sample(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(self.sample_data[0:3] + self.sample_data[9:12] + self.sample_data[18:21],
                          field.get_square_values(1))
         self.assertEqual(self.sample_data[60:63] + self.sample_data[69:72] + self.sample_data[78:81],
                          field.get_square_values(9))
 
     def test_find_options1(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         field.find_options1()
         self.assertEqual(
             [[2, 6, 9], [2, 7, 9], [2, 6, 7], [4, 5, 6, 7], [3, 4, 5, 6], [1], [3, 6, 7, 9], [8], [3, 4, 6, 7, 9], [5],
@@ -251,8 +243,7 @@ class FieldTests(unittest.TestCase):
              [1, 3, 7], [3, 4, 7], [5]], field.return_options())
 
     def test_find_options2(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         self.assertEqual(
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1,
@@ -273,8 +264,7 @@ class FieldTests(unittest.TestCase):
              0, 0, 0, 0, 0, 0, 0, 0, 0], 1))
 
     def test_find_answer(self):
-        field = Field()
-        field.fill(self.sample_data)
+        field = Field(self.sample_data)
         for _ in range(12):
             field.find_answer()
         self.assertEqual(
