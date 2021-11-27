@@ -2,8 +2,8 @@ import unittest
 
 
 class Cell:
-    def __init__(self, count, row, column, square, value=None):
-        self.count = count  # from 1 to 81
+    def __init__(self, pos, row, column, square, value=None):
+        self.pos = pos  # from 1 to 81
         self.row = row  # from 1 to 9
         self.column = column  # from 1 to 9
         self.square = square  # from 1 to 9
@@ -26,7 +26,7 @@ class Field:
         for row in range(1, 10):
             for column in range(1, 10):
                 self.cells.append(
-                    Cell(count=len(self.cells) + 1,
+                    Cell(pos=len(self.cells) + 1,
                          row=row, column=column,
                          square=int((row - 1) / 3) * 3 + int((column - 1) / 3) + 1))
 
@@ -97,38 +97,38 @@ class Field:
     def find_options2(self, value):
         result = []
         for each in self.cells:
-            if each.value is not None or \
-                    value in self.get_row_values(each.row) or \
+            if each.value is not None:
+                result.append(0)
+            elif value in self.get_row_values(each.row) or \
                     value in self.get_column_values(each.column) or \
                     value in self.get_square_values(each.square):
-                result.append(0)
+                result.append(None)
             else:
                 result.append(value)
         return Field(result)
 
     @staticmethod
-    def check_answer_in_square(matrix, square):
-        if matrix.get_square_values(square).count(0) != 8:
-            return False
-        for each in matrix.get_square_cells(square):
-            if each.value != 0:
-                return each.count
+    def cell_with_value_pos(cells):
+        return [each.pos for each in cells if each.value][0]
 
     @staticmethod
-    def check_answer_in_row(matrix, row):
-        if matrix.get_row_values(row).count(0) != 8:
-            return False
-        for each in matrix.get_row_cells(row):
-            if each.value != 0:
-                return each.count
+    def check_sum(values):
+        return sum([1 for each in values if each]) != 1
 
-    @staticmethod
-    def check_answer_in_column(matrix, column):
-        if matrix.get_column_values(column).count(0) != 8:
+    def check_answer_in_square(self, matrix, square):
+        if self.check_sum(matrix.get_square_values(square)):
             return False
-        for each in matrix.get_column_cells(column):
-            if each.value != 0:
-                return each.count
+        return self.cell_with_value_pos(matrix.get_square_cells(square))
+
+    def check_answer_in_row(self, matrix, row):
+        if self.check_sum(matrix.get_row_values(row)):
+            return False
+        return self.cell_with_value_pos(matrix.get_row_cells(row))
+
+    def check_answer_in_column(self, matrix, column):
+        if self.check_sum(matrix.get_column_values(column)):
+            return False
+        return self.cell_with_value_pos(matrix.get_column_cells(column))
 
     def find_answer_in_square(self, matrix, value):
         for square_number in range(1, 10):
@@ -185,8 +185,8 @@ class FieldTests(unittest.TestCase):
                    None, 6, 9, None, None, None, None, None, 5]
 
     def test_cell(self):
-        cell = Cell(count=1, row=2, column=3, square=4, value=5)
-        self.assertEqual(1, cell.count)
+        cell = Cell(pos=1, row=2, column=3, square=4, value=5)
+        self.assertEqual(1, cell.pos)
         self.assertEqual(2, cell.row)
         self.assertEqual(3, cell.column)
         self.assertEqual(4, cell.square)
@@ -195,21 +195,21 @@ class FieldTests(unittest.TestCase):
     def test_field(self):
         field = Field()
         cell = field.cells[0]
-        self.assertEqual(1, cell.count)
+        self.assertEqual(1, cell.pos)
         self.assertEqual(1, cell.row)
         self.assertEqual(1, cell.column)
         self.assertEqual(1, cell.square)
         self.assertEqual(None, cell.value)
 
         cell = field.cells[27]
-        self.assertEqual(28, cell.count)
+        self.assertEqual(28, cell.pos)
         self.assertEqual(4, cell.row)
         self.assertEqual(1, cell.column)
         self.assertEqual(4, cell.square)
         self.assertEqual(None, cell.value)
 
         cell = field.cells[80]
-        self.assertEqual(81, cell.count)
+        self.assertEqual(81, cell.pos)
         self.assertEqual(9, cell.row)
         self.assertEqual(9, cell.column)
         self.assertEqual(9, cell.square)
@@ -287,13 +287,15 @@ class FieldTests(unittest.TestCase):
     def test_find_options2(self):
         field = Field(self.sample_data)
         matrix1 = Field(
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
-             0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1,
-             1, 0, 0, 0, 1, 0, 1, 0, 0])
+            [None, None, None, None, None, 0, None, 0, None, 0, None, 0, None, 0, None, None, 0, None, 1, 1, 0, None,
+             None, None, 0, 0, None, 0, 0, 1, 0, None, None, 1, None, 1, 0, 0, None, 0, None, 0, 0, 0, None, 1, 0, 1, 0,
+             0, None, 1, None, 1, 1, 1, 1, None, 0, None, 0, None, 0, 1, 0, 0, None, 1, 0, 1, None, 1, 1, 0, 0, None, 1,
+             None, 1, None, 0])
         matrix2 = Field(
-            [9, 9, 0, 0, 0, 0, 9, 0, 9, 0, 9, 0, 0, 0, 9, 9, 0, 9, 9, 9, 0, 0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9,
-             0, 0, 0, 0, 0, 0, 0, 0, 0])
+            [9, 9, None, None, None, 0, 9, 0, 9, 0, 9, 0, None, 0, 9, 9, 0, 9, 9, 9, 0, None, None, 9, 0, 0, 9, 0, 0,
+             None, 0, None, None, None, None, None, 0, 0, None, 0, None, 0, 0, 0, 9, 9, 0, None, 0, 0, None, 9, 9, 9,
+             None, None, None, None, 0, None, 0, None, 0, None, 0, 0, None, None, 0, 9, 9, 9, None, 0, 0, None, None,
+             None, None, None, 0])
         self.assertEqual(matrix1, field.find_options2(1))
         self.assertEqual(matrix2, field.find_options2(9))
 
