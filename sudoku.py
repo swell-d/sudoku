@@ -43,6 +43,19 @@ class Field:
             if each.column == 9 and each.row in [3, 6]:
                 print('------+-------+------')
 
+    @staticmethod
+    def print_values(values):
+        for row in range(0, 9):
+            for column in range(0, 9):
+                value = values[row * 9 + column]
+                print(str(value) if value else '*', end=' ')
+                if column in [2, 5]:
+                    print('|', end=' ')
+                if column == 8:
+                    print('')
+                if column == 8 and row in [2, 5]:
+                    print('------+-------+------')
+
     def read_xlsx(self, filename):
         import openpyxl
         sheet = openpyxl.load_workbook(filename).active
@@ -51,38 +64,25 @@ class Field:
         self.check_found()
 
     def return_values(self):
-        result = []
-        for each in self.cells:
-            result.append(each.value)
-        return result
+        return [each.value for each in self.cells]
+
+    def get_row_cells(self, row):
+        return [each for each in self.cells if each.row == row]
 
     def get_row_values(self, row):
-        result = []
-        for each in self.cells:
-            if each.row == row:
-                result.append(each.value)
-        return result
+        return [each.value for each in self.cells if each.row == row]
+
+    def get_column_cells(self, column):
+        return [each for each in self.cells if each.column == column]
 
     def get_column_values(self, column):
-        result = []
-        for each in self.cells:
-            if each.column == column:
-                result.append(each.value)
-        return result
+        return [each.value for each in self.cells if each.column == column]
 
     def get_square_cells(self, square):
-        result = []
-        for each in self.cells:
-            if each.square == square:
-                result.append(each)
-        return result
+        return [each for each in self.cells if each.square == square]
 
     def get_square_values(self, square):
-        result = []
-        for each in self.cells:
-            if each.square == square:
-                result.append(each.value)
-        return result
+        return [each.value for each in self.cells if each.square == square]
 
     def find_options1(self):
         for each in self.cells:
@@ -115,12 +115,26 @@ class Field:
         return result
 
     @staticmethod
-    def check_answer_in_square(matrix_values, square):
-        matrix = Field()
-        matrix.fill(matrix_values)
+    def check_answer_in_square(matrix, square):
         if matrix.get_square_values(square).count(0) != 8:
             return False
         for each in matrix.get_square_cells(square):
+            if each.value != 0:
+                return each.count
+
+    @staticmethod
+    def check_answer_in_row(matrix, row):
+        if matrix.get_row_values(row).count(0) != 8:
+            return False
+        for each in matrix.get_row_cells(row):
+            if each.value != 0:
+                return each.count
+
+    @staticmethod
+    def check_answer_in_column(matrix, column):
+        if matrix.get_column_values(column).count(0) != 8:
+            return False
+        for each in matrix.get_column_cells(column):
             if each.value != 0:
                 return each.count
 
@@ -129,15 +143,28 @@ class Field:
         while self.found != 81 and i < 30:
             i += 1
             for value in range(1, 10):
-                matrix = self.find_options2(value)
+                matrix_values = self.find_options2(value)
+                matrix = Field(matrix_values)
+
                 for square_number in range(1, 10):
                     answer_in_square = self.check_answer_in_square(matrix, square_number)
                     if answer_in_square:
                         self.cells[answer_in_square - 1].value = value
                         # self.field[answer_in_square - 1].options = [value]
+
+                for row in range(1, 10):
+                    answer_in_row = self.check_answer_in_row(matrix, row)
+                    if answer_in_row:
+                        self.cells[answer_in_row - 1].value = value
+
+                for column in range(1, 10):
+                    answer_in_column = self.check_answer_in_column(matrix, column)
+                    if answer_in_column:
+                        self.cells[answer_in_column - 1].value = value
+
             self.check_found()
         self.print_field()
-        print(f'found with {i} steps')
+        print(f'found with {i} steps' if i != 30 else f'found {self.found} from 81')
 
     def check_found(self):
         result = 0
@@ -271,14 +298,16 @@ class FieldTests(unittest.TestCase):
              0, 0, 0, 0, 0, 0, 0, 0, 0], field.find_options2(9))
 
     def test_check_answer_in_square(self):
-        self.assertFalse(Field().check_answer_in_square(
+        field = Field(
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0], 1))
-        self.assertEqual(2, Field().check_answer_in_square(
+             0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertFalse(Field().check_answer_in_square(field, 1))
+        field = Field(
             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-             0, 0, 0, 0, 0, 0, 0, 0, 0], 1))
+             0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(2, Field().check_answer_in_square(field, 1))
 
     def test_find_answer(self):
         field = Field(self.sample_data)
