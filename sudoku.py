@@ -19,29 +19,21 @@ class Field:
         if data is not None:
             self.fill(data)
 
+    def __eq__(self, other):
+        return [each.value for each in self.cells] == [each.value for each in other.cells]
+
     def create_field(self):
         for row in range(1, 10):
             for column in range(1, 10):
                 self.cells.append(
                     Cell(count=len(self.cells) + 1,
-                         row=row,
-                         column=column,
+                         row=row, column=column,
                          square=int((row - 1) / 3) * 3 + int((column - 1) / 3) + 1))
 
     def fill(self, data):
         for i in range(81):
             self.cells[i].value = data[i]
         self.check_found()
-
-    def print_field(self):
-        for each in self.cells:
-            print(each.value if each.value is not None else '*', end=' ')
-            if each.column in [3, 6]:
-                print('|', end=' ')
-            if each.column == 9:
-                print('')
-            if each.column == 9 and each.row in [3, 6]:
-                print('------+-------+------')
 
     @staticmethod
     def print_values(values):
@@ -56,6 +48,9 @@ class Field:
                 if column == 8 and row in [2, 5]:
                     print('------+-------+------')
 
+    def print_field(self):
+        self.print_values(self.get_all_values())
+
     def read_xlsx(self, filename):
         import openpyxl
         sheet = openpyxl.load_workbook(filename).active
@@ -63,7 +58,7 @@ class Field:
             each.value = sheet.cell(row=each.row, column=each.column).value
         self.check_found()
 
-    def return_values(self):
+    def get_all_values(self):
         return [each.value for each in self.cells]
 
     def get_row_cells(self, row):
@@ -84,6 +79,9 @@ class Field:
     def get_square_values(self, square):
         return [each.value for each in self.cells if each.square == square]
 
+    def get_options(self):
+        return [each.options for each in self.cells]
+
     def find_options1(self):
         for each in self.cells:
             if each.value is not None:
@@ -96,12 +94,6 @@ class Field:
                         i in self.get_square_values(each.square):
                     each.options.remove(i)
 
-    def return_options(self):
-        result = []
-        for each in self.cells:
-            result.append(each.options)
-        return result
-
     def find_options2(self, value):
         result = []
         for each in self.cells:
@@ -112,7 +104,7 @@ class Field:
                 result.append(0)
             else:
                 result.append(value)
-        return result
+        return Field(result)
 
     @staticmethod
     def check_answer_in_square(matrix, square):
@@ -138,41 +130,47 @@ class Field:
             if each.value != 0:
                 return each.count
 
+    def find_answer_in_square(self, matrix, value):
+        for square_number in range(1, 10):
+            answer_in_square = self.check_answer_in_square(matrix, square_number)
+            if answer_in_square:
+                self.cells[answer_in_square - 1].value = value
+
+    def find_answer_in_row(self, matrix, value):
+        for row in range(1, 10):
+            answer_in_row = self.check_answer_in_row(matrix, row)
+            if answer_in_row:
+                self.cells[answer_in_row - 1].value = value
+
+    def find_answer_in_column(self, matrix, value):
+        for column in range(1, 10):
+            answer_in_column = self.check_answer_in_column(matrix, column)
+            if answer_in_column:
+                self.cells[answer_in_column - 1].value = value
+
+    def make_search(self):
+        for value in range(1, 10):
+            matrix = self.find_options2(value)
+            self.find_answer_in_square(matrix, value)
+            self.find_answer_in_row(matrix, value)
+            self.find_answer_in_column(matrix, value)
+
     def find_answer(self):
         i = 0
-        while self.found != 81 and i < 30:
+        break_text = ''
+        while self.found != 81:
             i += 1
-            for value in range(1, 10):
-                matrix_values = self.find_options2(value)
-                matrix = Field(matrix_values)
-
-                for square_number in range(1, 10):
-                    answer_in_square = self.check_answer_in_square(matrix, square_number)
-                    if answer_in_square:
-                        self.cells[answer_in_square - 1].value = value
-                        # self.field[answer_in_square - 1].options = [value]
-
-                for row in range(1, 10):
-                    answer_in_row = self.check_answer_in_row(matrix, row)
-                    if answer_in_row:
-                        self.cells[answer_in_row - 1].value = value
-
-                for column in range(1, 10):
-                    answer_in_column = self.check_answer_in_column(matrix, column)
-                    if answer_in_column:
-                        self.cells[answer_in_column - 1].value = value
-
+            found_before = self.found
+            self.make_search()
             self.check_found()
+            if found_before == self.found:
+                break_text = f'found {self.found} from 81\n'
+                break
         self.print_field()
-        print(f'found with {i} steps' if i != 30 else f'found {self.found} from 81')
+        print(f'{break_text}found with {i} steps')
 
     def check_found(self):
-        result = 0
-        for each in self.cells:
-            if each.value is None:
-                continue
-            result += 1
-        self.found = result
+        self.found = sum([1 for each in self.cells if each.value is not None])
 
 
 class FieldTests(unittest.TestCase):
@@ -220,17 +218,17 @@ class FieldTests(unittest.TestCase):
     def test_read_xlsx_return_something(self):
         field = Field()
         field.read_xlsx(r'2021-11-23.xlsx')
-        self.assertIsNotNone(field.return_values())
+        self.assertIsNotNone(field.get_all_values())
 
     def test_read_xlsx_return_81_numbers(self):
         field = Field()
         field.read_xlsx(r'2021-11-23.xlsx')
-        self.assertEqual(81, len(field.return_values()))
+        self.assertEqual(81, len(field.get_all_values()))
 
     def test_read_xlsx_return_sample(self):
         field = Field()
         field.read_xlsx(r'2021-11-23.xlsx')
-        self.assertEqual(self.sample_data.copy(), field.return_values())
+        self.assertEqual(self.sample_data.copy(), field.get_all_values())
 
     def test_get_row_values_return_something(self):
         field = Field(self.sample_data)
@@ -284,18 +282,20 @@ class FieldTests(unittest.TestCase):
              [1, 2, 6, 9], [8], [1, 2, 6], [3], [7], [2, 4, 6], [1, 5, 6, 9], [6, 9], [1, 6, 9], [1, 3], [1, 7],
              [1, 5, 7], [4, 5, 6, 7], [9], [4, 6, 7], [8], [3, 4, 6, 7], [2], [1, 2], [4], [8], [2, 5, 6, 7], [1, 5, 6],
              [3], [1, 6, 7, 9], [6, 7, 9], [1, 6, 7, 9], [1, 2, 3], [6], [9], [2, 4, 7, 8], [1, 4, 8], [2, 4, 7, 8],
-             [1, 3, 7], [3, 4, 7], [5]], field.return_options())
+             [1, 3, 7], [3, 4, 7], [5]], field.get_options())
 
     def test_find_options2(self):
         field = Field(self.sample_data)
-        self.assertEqual(
+        matrix1 = Field(
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1,
              0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1,
-             1, 0, 0, 0, 1, 0, 1, 0, 0], field.find_options2(1))
-        self.assertEqual(
+             1, 0, 0, 0, 1, 0, 1, 0, 0])
+        matrix2 = Field(
             [9, 9, 0, 0, 0, 0, 9, 0, 9, 0, 9, 0, 0, 0, 9, 9, 0, 9, 9, 9, 0, 0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0,
              0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 9, 9,
-             0, 0, 0, 0, 0, 0, 0, 0, 0], field.find_options2(9))
+             0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertEqual(matrix1, field.find_options2(1))
+        self.assertEqual(matrix2, field.find_options2(9))
 
     def test_check_answer_in_square(self):
         field = Field(
@@ -315,7 +315,7 @@ class FieldTests(unittest.TestCase):
         self.assertEqual(
             [6, 2, 7, 5, 3, 1, 9, 8, 4, 5, 9, 4, 8, 2, 7, 6, 1, 3, 8, 1, 3, 6, 4, 9, 2, 5, 7, 4, 5, 1, 9,
              6, 2, 3, 7, 8, 7, 3, 6, 1, 8, 5, 4, 2, 9, 9, 8, 2, 3, 7, 4, 5, 6, 1, 1, 7, 5, 4, 9, 6, 8, 3,
-             2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5], field.return_values())
+             2, 2, 4, 8, 7, 5, 3, 1, 9, 6, 3, 6, 9, 2, 1, 8, 7, 4, 5], field.get_all_values())
 
     def test_check_found(self):
         field = Field(self.sample_data)
