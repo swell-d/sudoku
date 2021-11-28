@@ -107,6 +107,19 @@ class Field:
                 result.append(value)
         return Field(result)
 
+    def find_options3(self):
+        for cell in self.cells:
+            cell.options = []
+        for value in range(1, 10):
+            matrix = self.find_options2(value)
+            self.matrix_optimize(matrix)
+            for cell in matrix.cells:
+                if self.cells[cell.pos - 1].value:
+                    self.cells[cell.pos - 1].options = [self.cells[cell.pos - 1].value]
+                    continue
+                if cell.value:
+                    self.cells[cell.pos - 1].options.append(value)
+
     @staticmethod
     def cell_with_value_pos(cells):
         return [each.pos for each in cells if each.value][0]
