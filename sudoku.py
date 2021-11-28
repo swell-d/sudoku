@@ -40,7 +40,7 @@ class Field:
         for row in range(0, 9):
             for column in range(0, 9):
                 value = values[row * 9 + column]
-                print(str(value) if value else '*', end=' ')
+                print(str(value) if value is not None else '.', end=' ')
                 if column in [2, 5]:
                     print('|', end=' ')
                 if column == 8:
@@ -98,7 +98,7 @@ class Field:
         result = []
         for each in self.cells:
             if each.value is not None:
-                result.append(0)
+                result.append(None)
             elif value in self.get_row_values(each.row) or \
                     value in self.get_column_values(each.column) or \
                     value in self.get_square_values(each.square):
@@ -151,9 +151,29 @@ class Field:
     def make_search(self):
         for value in range(1, 10):
             matrix = self.find_options2(value)
+            self.matrix_optimize(matrix)
+
             self.find_answer_in_square(matrix, value)
             self.find_answer_in_row(matrix, value)
             self.find_answer_in_column(matrix, value)
+
+    @staticmethod
+    def matrix_optimize(matrix):
+        for square in range(1, 10):
+            square_cells = matrix.get_square_cells(square)
+            cells_with_value = [cell for cell in square_cells if cell.value]
+            if len(set([cell.row for cell in cells_with_value])) == 1:
+                row = matrix.get_row_cells(cells_with_value[0].row)
+                for cell in cells_with_value:
+                    row.remove(cell)
+                for cell in row:
+                    cell.value = None
+            if len(set([cell.column for cell in cells_with_value])) == 1:
+                column = matrix.get_column_cells(cells_with_value[0].column)
+                for cell in cells_with_value:
+                    column.remove(cell)
+                for cell in column:
+                    cell.value = None
 
     def find_answer(self):
         i = 0
@@ -171,6 +191,15 @@ class Field:
 
     def check_found(self):
         self.found = sum([1 for each in self.cells if each.value is not None])
+
+    def self_check(self):
+        for i in range(1, 10):
+            for value in range(1, 10):
+                if self.get_row_values(i).count(value) > 1 or \
+                        self.get_column_values(i).count(value) > 1 or \
+                        self.get_square_values(i).count(value) > 1:
+                    return False
+        return True
 
 
 class FieldTests(unittest.TestCase):
@@ -322,6 +351,12 @@ class FieldTests(unittest.TestCase):
     def test_check_found(self):
         field = Field(self.sample_data)
         self.assertEqual(30, field.found)
+
+    def test_self_check(self):
+        field = Field(self.sample_data)
+        self.assertTrue(field.self_check())
+        field.cells[0].value = 1
+        self.assertFalse(field.self_check())
 
 #   1   2	3
 #   4   5	6
