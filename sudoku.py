@@ -20,7 +20,7 @@ class Field:
             self.fill(data)
 
     def __eq__(self, other):
-        return [each.value for each in self.cells] == [each.value for each in other.cells]
+        return self.get_all_values() == other.get_all_values()
 
     def create_field(self):
         for row in range(1, 10):
@@ -105,14 +105,15 @@ class Field:
                 result.append(None)
             else:
                 result.append(value)
-        return Field(result)
+        matrix = Field(result)
+        matrix.matrix_optimize()
+        return matrix
 
     def find_options3(self):
         for cell in self.cells:
             cell.options = []
         for value in range(1, 10):
             matrix = self.find_options2(value)
-            self.matrix_optimize(matrix)
             for cell in matrix.cells:
                 if self.cells[cell.pos - 1].value:
                     self.cells[cell.pos - 1].options = [self.cells[cell.pos - 1].value]
@@ -164,25 +165,23 @@ class Field:
     def make_search(self):
         for value in range(1, 10):
             matrix = self.find_options2(value)
-            self.matrix_optimize(matrix)
 
             self.find_answer_in_square(matrix, value)
             self.find_answer_in_row(matrix, value)
             self.find_answer_in_column(matrix, value)
 
-    @staticmethod
-    def matrix_optimize(matrix):
+    def matrix_optimize(self):
         for square in range(1, 10):
-            square_cells = matrix.get_square_cells(square)
+            square_cells = self.get_square_cells(square)
             cells_with_value = [cell for cell in square_cells if cell.value]
             if len(set([cell.row for cell in cells_with_value])) == 1:
-                row = matrix.get_row_cells(cells_with_value[0].row)
+                row = self.get_row_cells(cells_with_value[0].row)
                 for cell in cells_with_value:
                     row.remove(cell)
                 for cell in row:
                     cell.value = None
             if len(set([cell.column for cell in cells_with_value])) == 1:
-                column = matrix.get_column_cells(cells_with_value[0].column)
+                column = self.get_column_cells(cells_with_value[0].column)
                 for cell in cells_with_value:
                     column.remove(cell)
                 for cell in column:
@@ -329,15 +328,17 @@ class FieldTests(unittest.TestCase):
     def test_find_options2(self):
         field = Field(self.sample_data)
         matrix1 = Field(
-            [None, None, None, None, None, 0, None, 0, None, 0, None, 0, None, 0, None, None, 0, None, 1, 1, 0, None,
-             None, None, 0, 0, None, 0, 0, 1, 0, None, None, 1, None, 1, 0, 0, None, 0, None, 0, 0, 0, None, 1, 0, 1, 0,
-             0, None, 1, None, 1, 1, 1, 1, None, 0, None, 0, None, 0, 1, 0, 0, None, 1, 0, 1, None, 1, 1, 0, 0, None, 1,
-             None, 1, None, 0])
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             1, 1, None, None, None, None, None, None, None, None, None, 1, None, None, None, 1, None, 1, None, None,
+             None, None, None, None, None, None, None, 1, None, 1, None, None, None, 1, None, 1, 1, 1, 1, None, None,
+             None, None, None, None, 1, None, None, None, 1, None, 1, None, 1, 1, None, None, None, 1, None, 1, None,
+             None])
         matrix2 = Field(
-            [9, 9, None, None, None, 0, 9, 0, 9, 0, 9, 0, None, 0, 9, 9, 0, 9, 9, 9, 0, None, None, 9, 0, 0, 9, 0, 0,
-             None, 0, None, None, None, None, None, 0, 0, None, 0, None, 0, 0, 0, 9, 9, 0, None, 0, 0, None, 9, 9, 9,
-             None, None, None, None, 0, None, 0, None, 0, None, 0, 0, None, None, 0, 9, 9, 9, None, 0, 0, None, None,
-             None, None, None, 0])
+            [None, 9, None, None, None, None, 9, None, None, None, 9, None, None, None, 9, 9, None, None, None, 9, None,
+             None, None, 9, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, 9, 9, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, None, None, None, 9, 9, None, None, None, None, None, None,
+             None, None, None, None])
         self.assertEqual(matrix1, field.find_options2(1))
         self.assertEqual(matrix2, field.find_options2(9))
 
