@@ -47,6 +47,7 @@ class Field:
                     print('')
                 if column == 8 and row in [2, 5]:
                     print('------+-------+------')
+        print('')
 
     def print_field(self):
         self.print_values(self.get_all_values())
@@ -112,9 +113,9 @@ class Field:
     def find_options3(self):
         for cell in self.cells:
             cell.options = []
+        matrix = [self.find_options2(value) for value in range(1, 10)]
         for value in range(1, 10):
-            matrix = self.find_options2(value)
-            for cell in matrix.cells:
+            for cell in matrix[value].cells:
                 if self.cells[cell.pos - 1].value:
                     self.cells[cell.pos - 1].options = [self.cells[cell.pos - 1].value]
                     continue
@@ -170,22 +171,28 @@ class Field:
             self.find_answer_in_row(matrix, value)
             self.find_answer_in_column(matrix, value)
 
+    def matrix_optimize_check_row(self, cells_with_value):
+        if len(set([cell.row for cell in cells_with_value])) == 1:
+            row = self.get_row_cells(cells_with_value[0].row)
+            for cell in cells_with_value:
+                row.remove(cell)
+            for cell in row:
+                cell.value = None
+
+    def matrix_optimize_check_column(self, cells_with_value):
+        if len(set([cell.column for cell in cells_with_value])) == 1:
+            column = self.get_column_cells(cells_with_value[0].column)
+            for cell in cells_with_value:
+                column.remove(cell)
+            for cell in column:
+                cell.value = None
+
     def matrix_optimize(self):
         for square in range(1, 10):
             square_cells = self.get_square_cells(square)
             cells_with_value = [cell for cell in square_cells if cell.value]
-            if len(set([cell.row for cell in cells_with_value])) == 1:
-                row = self.get_row_cells(cells_with_value[0].row)
-                for cell in cells_with_value:
-                    row.remove(cell)
-                for cell in row:
-                    cell.value = None
-            if len(set([cell.column for cell in cells_with_value])) == 1:
-                column = self.get_column_cells(cells_with_value[0].column)
-                for cell in cells_with_value:
-                    column.remove(cell)
-                for cell in column:
-                    cell.value = None
+            self.matrix_optimize_check_row(cells_with_value)
+            self.matrix_optimize_check_column(cells_with_value)
 
     def find_answer(self):
         i = 0
