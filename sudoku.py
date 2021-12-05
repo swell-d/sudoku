@@ -12,7 +12,7 @@ class Cell:
         self.options = []
         self.possible_options_row = set()
         self.possible_options_column = set()
-        # self.impossible_options = set()
+        self.impossible_options = set()
 
 
 class Field:
@@ -90,10 +90,17 @@ class Field:
     def get_options(self):
         return [each.options for each in self.cells]
 
-    # def get_possible_options(self):
-    #     return [each.possible_options for each in self.cells]
+    def get_possible_options_row(self):
+        return [each.possible_options_row for each in self.cells]
+
+    def get_possible_options_column(self):
+        return [each.possible_options_column for each in self.cells]
+
+    def get_impossible_options(self):
+        return [each.impossible_options for each in self.cells]
 
     def find_options1(self):
+        self.clear_options()
         for each in self.cells:
             if each.value is not None:
                 each.options.append(each.value)
@@ -102,7 +109,8 @@ class Field:
             for i in range(1, 10):
                 if i in self.get_row_values(each.row) or \
                         i in self.get_column_values(each.column) or \
-                        i in self.get_square_values(each.square):
+                        i in self.get_square_values(each.square) or \
+                        i in each.impossible_options:
                     each.options.remove(i)
 
     def get_matrix(self, value):
@@ -124,8 +132,8 @@ class Field:
                     result.append(None)
                 elif len(each.possible_options_column) == 3 and value not in each.possible_options_column:
                     result.append(None)
-                # elif value in each.impossible_options:
-                #     result.append(None)
+                elif value in each.impossible_options:
+                    result.append(None)
                 else:
                     result.append(value)
         return result
@@ -134,6 +142,8 @@ class Field:
         self.clear_options()
         for value in range(1, 10):
             for matrix_cell in self.get_matrix(value).cells:
+                if value in self.cells[matrix_cell.i].impossible_options:
+                    continue
                 if self.cells[matrix_cell.i].value:
                     self.cells[matrix_cell.i].options = [self.cells[matrix_cell.i].value]
                     continue
@@ -148,7 +158,6 @@ class Field:
         for cell in self.cells:
             cell.possible_options_row = set()
             cell.possible_options_column = set()
-            # cell.impossible_options = set()
 
     @staticmethod
     def cell_with_value_pos(cells):
@@ -283,23 +292,29 @@ class Field:
                 elif modified_columns[0] == 0 and modified_columns[1] == 0 and modified_columns[2] > 0:
                     self.fill_possible_impossible_values_column(matrix, square_number, columns_in_square, value, 2)
 
-    def fill_possible_impossible_values_row(self, matrix, square_number, lines, value, local_row):
-        row_number = lines[local_row][0].row
+    def fill_possible_impossible_values_row(self, matrix, square_number, rows, value, local_row):
+        row_number = rows[local_row][0].row
         row_values = matrix.get_row_cells(row_number)
-        values_in_same_square = [1 for each in row_values if
-                                 (each.square == square_number or each.value is None)]
-        if sum(values_in_same_square) == 9:
-            for matrix_cell in lines[local_row]:
+        all_values_in_same_square = sum([1 for each in row_values if
+                                         (each.square == square_number or each.value is None)]) == 9
+        if all_values_in_same_square:
+            for matrix_cell in rows[local_row]:
                 self.cells[matrix_cell.i].possible_options_row.add(value)
+            for cell in self.get_square_cells(square_number):
+                if cell.row != row_number:
+                    cell.impossible_options.add(value)
 
     def fill_possible_impossible_values_column(self, matrix, square_number, columns, value, local_column):
         column_number = columns[local_column][0].column
         column_values = matrix.get_column_cells(column_number)
-        values_in_same_square = [1 for each in column_values if
-                                 (each.square == square_number or each.value is None)]
-        if sum(values_in_same_square) == 9:
+        all_values_in_same_square = sum([1 for each in column_values if
+                                         (each.square == square_number or each.value is None)]) == 9
+        if all_values_in_same_square:
             for matrix_cell in columns[local_column]:
                 self.cells[matrix_cell.i].possible_options_column.add(value)
+            for cell in self.get_square_cells(square_number):
+                if cell.column != column_number:
+                    cell.impossible_options.add(value)
 
 
 class FieldTests(unittest.TestCase):
@@ -413,7 +428,7 @@ class FieldTests(unittest.TestCase):
              [3], [1, 6, 7, 9], [6, 7, 9], [1, 6, 7, 9], [1, 2, 3], [6], [9], [2, 4, 7, 8], [1, 4, 8], [2, 4, 7, 8],
              [1, 3, 7], [3, 4, 7], [5]], field.get_options())
 
-    def test_find_options2(self):
+    def test_get_matrix(self):
         field = Field(self.sample_data)
         matrix1 = Field(
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
