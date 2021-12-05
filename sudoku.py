@@ -100,7 +100,12 @@ class Field:
                         i in self.get_square_values(each.square):
                     each.options.remove(i)
 
-    def find_options2(self, value):
+    def get_matrix(self, value):
+        matrix = Field(self.get_matrix_values(value))
+        matrix.matrix_optimize()
+        return matrix
+
+    def get_matrix_values(self, value):
         result = []
         for each in self.cells:
             if each.value is not None:
@@ -112,17 +117,16 @@ class Field:
             else:
                 if len(each.possible_options) == 3 and value not in each.possible_options:
                     result.append(None)
+                elif value in each.impossible_options:
+                    result.append(None)
                 else:
                     result.append(value)
-
-        matrix = Field(result)
-        matrix.matrix_optimize()
-        return matrix
+        return result
 
     def find_options3(self):
         self.clear_options()
         for value in range(1, 10):
-            for matrix_cell in self.find_options2(value).cells:
+            for matrix_cell in self.get_matrix(value).cells:
                 pos_matrix_cell = matrix_cell.pos - 1
                 if self.cells[pos_matrix_cell].value:
                     self.cells[pos_matrix_cell].options = [self.cells[pos_matrix_cell].value]
@@ -134,9 +138,10 @@ class Field:
         for cell in self.cells:
             cell.options = []
 
-    def clear_options2(self):
+    def clear_possible_options(self):
         for cell in self.cells:
             cell.possible_options = set()
+            cell.impossible_options = set()
 
     @staticmethod
     def cell_with_value_pos(cells):
@@ -182,7 +187,7 @@ class Field:
     def make_search(self):
         for value in range(1, 10):
             self.only_possible_values()
-            matrix = self.find_options2(value)
+            matrix = self.get_matrix(value)
 
             self.find_answer_in_square(matrix, value)
             self.find_answer_in_row(matrix, value)
@@ -205,6 +210,7 @@ class Field:
                 cell.value = None
 
     def matrix_optimize(self):
+        # if the value possible only in one row/column in square, then remove this value in other cells in row/column
         for square in range(1, 10):
             square_cells = self.get_square_cells(square)
             cells_with_value = [cell for cell in square_cells if cell.value]
@@ -237,12 +243,10 @@ class Field:
                     return False
         return True
 
-
-
     def only_possible_values(self):
-        self.clear_options2()
+        self.clear_possible_options()
         for value in range(1, 10):
-            matrix = self.find_options2(value)
+            matrix = self.get_matrix(value)
             for square_number in range(1, 10):
                 square = matrix.get_square_cells(square_number)
 
@@ -416,8 +420,8 @@ class FieldTests(unittest.TestCase):
              None, None, None, None, None, 9, 9, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, 9, 9, None, None, None, None, None, None,
              None, None, None, None])
-        self.assertEqual(matrix1, field.find_options2(1))
-        self.assertEqual(matrix2, field.find_options2(9))
+        self.assertEqual(matrix1, field.get_matrix(1))
+        self.assertEqual(matrix2, field.get_matrix(9))
 
     def test_check_answer_in_square(self):
         field = Field(
