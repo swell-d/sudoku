@@ -9,7 +9,8 @@ class Cell:
         self.square = square  # from 1 to 9
         self.value = value  # from 1 to 9
         self.options = []
-        self.options2 = set()
+        self.possible_options = set()
+        self.impossible_options = set()
 
 
 class Field:
@@ -84,8 +85,8 @@ class Field:
     def get_options(self):
         return [each.options for each in self.cells]
 
-    def get_options2(self):
-        return [each.options2 for each in self.cells]
+    def get_possible_options(self):
+        return [each.possible_options for each in self.cells]
 
     def find_options1(self):
         for each in self.cells:
@@ -109,7 +110,7 @@ class Field:
                     value in self.get_square_values(each.square):
                 result.append(None)
             else:
-                if len(each.options2) == 3 and value not in each.options2:
+                if len(each.possible_options) == 3 and value not in each.possible_options:
                     result.append(None)
                 else:
                     result.append(value)
@@ -135,7 +136,7 @@ class Field:
 
     def clear_options2(self):
         for cell in self.cells:
-            cell.options2 = set()
+            cell.possible_options = set()
 
     @staticmethod
     def cell_with_value_pos(cells):
@@ -236,75 +237,58 @@ class Field:
                     return False
         return True
 
+
+
     def only_possible_values(self):
         self.clear_options2()
         for value in range(1, 10):
             matrix = self.find_options2(value)
             for square_number in range(1, 10):
                 square = matrix.get_square_cells(square_number)
+
                 lines = [[square[0], square[1], square[2]],
                          [square[3], square[4], square[5]],
                          [square[6], square[7], square[8]]]
-
-                columns = [[square[0], square[3], square[6]],
-                           [square[1], square[4], square[7]],
-                           [square[2], square[5], square[8]]]
-
                 lines2 = []
                 for line in lines:
                     lines2.append(sum([1 for each in line if each.value is not None]))
                 if lines2[0] > 0 and lines2[1] == 0 and lines2[2] == 0:
-                    row_number = lines[0][0].row
-                    row_values = matrix.get_row_cells(row_number)
-                    values_in_same_square = [1 for each in row_values if
-                                             (each.square == square_number or each.value is None)]
-                    if sum(values_in_same_square) == 9:
-                        for matrix_cell in lines[0]:
-                            self.cells[matrix_cell.pos - 1].options2.add(value)
+                    self.fill_possible_impossible_values_row(matrix, square_number, lines, value, 0)
                 elif lines2[0] == 0 and lines2[1] > 0 and lines2[2] == 0:
-                    row_number = lines[1][0].row
-                    row_values = matrix.get_row_cells(row_number)
-                    values_in_same_square = [1 for each in row_values if
-                                             (each.square == square_number or each.value is None)]
-                    if sum(values_in_same_square) == 9:
-                        for matrix_cell in lines[1]:
-                            self.cells[matrix_cell.pos - 1].options2.add(value)
+                    self.fill_possible_impossible_values_row(matrix, square_number, lines, value, 1)
                 elif lines2[0] == 0 and lines2[1] == 0 and lines2[2] > 0:
-                    row_number = lines[2][0].row
-                    row_values = matrix.get_row_cells(row_number)
-                    values_in_same_square = [1 for each in row_values if
-                                             (each.square == square_number or each.value is None)]
-                    if sum(values_in_same_square) == 9:
-                        for matrix_cell in lines[2]:
-                            self.cells[matrix_cell.pos - 1].options2.add(value)
+                    self.fill_possible_impossible_values_row(matrix, square_number, lines, value, 2)
 
+                columns = [[square[0], square[3], square[6]],
+                           [square[1], square[4], square[7]],
+                           [square[2], square[5], square[8]]]
                 columns2 = []
                 for column in columns:
                     columns2.append(sum([1 for each in column if each.value is not None]))
                 if columns2[0] > 0 and columns2[1] == 0 and columns2[2] == 0:
-                    column_number = columns[0][0].column
-                    column_values = matrix.get_column_cells(column_number)
-                    values_in_same_square = [1 for each in column_values if
-                                             (each.square == square_number or each.value is None)]
-                    if sum(values_in_same_square) == 9:
-                        for matrix_cell in columns[0]:
-                            self.cells[matrix_cell.pos - 1].options2.add(value)
+                    self.fill_possible_impossible_values_column(matrix, square_number, columns, value, 0)
                 elif columns2[0] == 0 and columns2[1] > 0 and columns2[2] == 0:
-                    column_number = columns[1][0].column
-                    column_values = matrix.get_column_cells(column_number)
-                    values_in_same_square = [1 for each in column_values if
-                                             (each.square == square_number or each.value is None)]
-                    if sum(values_in_same_square) == 9:
-                        for matrix_cell in columns[1]:
-                            self.cells[matrix_cell.pos - 1].options2.add(value)
+                    self.fill_possible_impossible_values_column(matrix, square_number, columns, value, 1)
                 elif columns2[0] == 0 and columns2[1] == 0 and columns2[2] > 0:
-                    column_number = columns[2][0].column
-                    column_values = matrix.get_column_cells(column_number)
-                    values_in_same_square = [1 for each in column_values if
-                                             (each.square == square_number or each.value is None)]
-                    if sum(values_in_same_square) == 9:
-                        for matrix_cell in columns[2]:
-                            self.cells[matrix_cell.pos - 1].options2.add(value)
+                    self.fill_possible_impossible_values_column(matrix, square_number, columns, value, 2)
+
+    def fill_possible_impossible_values_row(self, matrix, square_number, lines, value, local_row):
+        row_number = lines[local_row][0].row
+        row_values = matrix.get_row_cells(row_number)
+        values_in_same_square = [1 for each in row_values if
+                                 (each.square == square_number or each.value is None)]
+        if sum(values_in_same_square) == 9:
+            for matrix_cell in lines[local_row]:
+                self.cells[matrix_cell.pos - 1].possible_options.add(value)
+
+    def fill_possible_impossible_values_column(self, matrix, square_number, columns, value, local_column):
+        column_number = columns[local_column][0].column
+        column_values = matrix.get_column_cells(column_number)
+        values_in_same_square = [1 for each in column_values if
+                                 (each.square == square_number or each.value is None)]
+        if sum(values_in_same_square) == 9:
+            for matrix_cell in columns[local_column]:
+                self.cells[matrix_cell.pos - 1].possible_options.add(value)
 
 
 class FieldTests(unittest.TestCase):
