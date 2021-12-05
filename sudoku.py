@@ -57,11 +57,14 @@ class Field:
         self.print_values(self.get_all_values())
 
     def read_xlsx(self, filename):
+        print(f'load {filename}')
         import openpyxl
         sheet = openpyxl.load_workbook(filename).active
         for each in self.cells:
             each.value = sheet.cell(row=each.row, column=each.column).value
         self.check_found()
+        self.print_field()
+        print(f'{self.found} filled cells at the start\n')
 
     def get_all_values(self):
         return [each.value for each in self.cells]
