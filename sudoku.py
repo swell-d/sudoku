@@ -220,7 +220,7 @@ class Field:
             self.matrix_optimize_check_row(cells_with_value)
             self.matrix_optimize_check_column(cells_with_value)
 
-    def find_answer(self, hard=True):
+    def find_answer(self, hard=True, print_info=False):
         i = 0
         break_text = ''
         while self.found != 81:
@@ -229,10 +229,11 @@ class Field:
             self.make_search(hard)
             self.check_found()
             if found_before == self.found:
-                # break_text = f'found {self.found} from 81\n'
+                break_text = f'found {self.found} from 81\n'
                 break
-        # self.print_field()
-        # print(f'{break_text}found with {i} steps')
+        if print_info:
+            self.print_field()
+            print(f'{break_text}found with {i} steps')
 
     def check_found(self):
         self.found = sum([1 for each in self.cells if each.value is not None])
