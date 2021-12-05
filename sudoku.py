@@ -3,14 +3,16 @@ import unittest
 
 class Cell:
     def __init__(self, pos, row, column, square, value=None):
+        self.i = pos - 1  # from 0 to 80
         self.pos = pos  # from 1 to 81
         self.row = row  # from 1 to 9
         self.column = column  # from 1 to 9
         self.square = square  # from 1 to 9
         self.value = value  # from 1 to 9
         self.options = []
-        self.possible_options = set()
-        self.impossible_options = set()
+        self.possible_options_row = set()
+        self.possible_options_column = set()
+        # self.impossible_options = set()
 
 
 class Field:
@@ -85,8 +87,8 @@ class Field:
     def get_options(self):
         return [each.options for each in self.cells]
 
-    def get_possible_options(self):
-        return [each.possible_options for each in self.cells]
+    # def get_possible_options(self):
+    #     return [each.possible_options for each in self.cells]
 
     def find_options1(self):
         for each in self.cells:
@@ -115,10 +117,12 @@ class Field:
                     value in self.get_square_values(each.square):
                 result.append(None)
             else:
-                if len(each.possible_options) == 3 and value not in each.possible_options:
+                if len(each.possible_options_row) == 3 and value not in each.possible_options_row:
                     result.append(None)
-                elif value in each.impossible_options:
+                elif len(each.possible_options_column) == 3 and value not in each.possible_options_column:
                     result.append(None)
+                # elif value in each.impossible_options:
+                #     result.append(None)
                 else:
                     result.append(value)
         return result
@@ -127,12 +131,11 @@ class Field:
         self.clear_options()
         for value in range(1, 10):
             for matrix_cell in self.get_matrix(value).cells:
-                pos_matrix_cell = matrix_cell.pos - 1
-                if self.cells[pos_matrix_cell].value:
-                    self.cells[pos_matrix_cell].options = [self.cells[pos_matrix_cell].value]
+                if self.cells[matrix_cell.i].value:
+                    self.cells[matrix_cell.i].options = [self.cells[matrix_cell.i].value]
                     continue
                 if matrix_cell.value:
-                    self.cells[pos_matrix_cell].options.append(value)
+                    self.cells[matrix_cell.i].options.append(value)
 
     def clear_options(self):
         for cell in self.cells:
@@ -140,8 +143,9 @@ class Field:
 
     def clear_possible_options(self):
         for cell in self.cells:
-            cell.possible_options = set()
-            cell.impossible_options = set()
+            cell.possible_options_row = set()
+            cell.possible_options_column = set()
+            # cell.impossible_options = set()
 
     @staticmethod
     def cell_with_value_pos(cells):
@@ -250,31 +254,31 @@ class Field:
             for square_number in range(1, 10):
                 square = matrix.get_square_cells(square_number)
 
-                lines = [[square[0], square[1], square[2]],
-                         [square[3], square[4], square[5]],
-                         [square[6], square[7], square[8]]]
-                lines2 = []
-                for line in lines:
-                    lines2.append(sum([1 for each in line if each.value is not None]))
-                if lines2[0] > 0 and lines2[1] == 0 and lines2[2] == 0:
-                    self.fill_possible_impossible_values_row(matrix, square_number, lines, value, 0)
-                elif lines2[0] == 0 and lines2[1] > 0 and lines2[2] == 0:
-                    self.fill_possible_impossible_values_row(matrix, square_number, lines, value, 1)
-                elif lines2[0] == 0 and lines2[1] == 0 and lines2[2] > 0:
-                    self.fill_possible_impossible_values_row(matrix, square_number, lines, value, 2)
+                rows_in_square = [[square[0], square[1], square[2]],
+                                  [square[3], square[4], square[5]],
+                                  [square[6], square[7], square[8]]]
+                modified_rows = []
+                for row_in_square in rows_in_square:
+                    modified_rows.append(sum([1 for each in row_in_square if each.value is not None]))
+                if modified_rows[0] > 0 and modified_rows[1] == 0 and modified_rows[2] == 0:
+                    self.fill_possible_impossible_values_row(matrix, square_number, rows_in_square, value, 0)
+                elif modified_rows[0] == 0 and modified_rows[1] > 0 and modified_rows[2] == 0:
+                    self.fill_possible_impossible_values_row(matrix, square_number, rows_in_square, value, 1)
+                elif modified_rows[0] == 0 and modified_rows[1] == 0 and modified_rows[2] > 0:
+                    self.fill_possible_impossible_values_row(matrix, square_number, rows_in_square, value, 2)
 
-                columns = [[square[0], square[3], square[6]],
-                           [square[1], square[4], square[7]],
-                           [square[2], square[5], square[8]]]
-                columns2 = []
-                for column in columns:
-                    columns2.append(sum([1 for each in column if each.value is not None]))
-                if columns2[0] > 0 and columns2[1] == 0 and columns2[2] == 0:
-                    self.fill_possible_impossible_values_column(matrix, square_number, columns, value, 0)
-                elif columns2[0] == 0 and columns2[1] > 0 and columns2[2] == 0:
-                    self.fill_possible_impossible_values_column(matrix, square_number, columns, value, 1)
-                elif columns2[0] == 0 and columns2[1] == 0 and columns2[2] > 0:
-                    self.fill_possible_impossible_values_column(matrix, square_number, columns, value, 2)
+                columns_in_square = [[square[0], square[3], square[6]],
+                                     [square[1], square[4], square[7]],
+                                     [square[2], square[5], square[8]]]
+                modified_columns = []
+                for column_in_square in columns_in_square:
+                    modified_columns.append(sum([1 for each in column_in_square if each.value is not None]))
+                if modified_columns[0] > 0 and modified_columns[1] == 0 and modified_columns[2] == 0:
+                    self.fill_possible_impossible_values_column(matrix, square_number, columns_in_square, value, 0)
+                elif modified_columns[0] == 0 and modified_columns[1] > 0 and modified_columns[2] == 0:
+                    self.fill_possible_impossible_values_column(matrix, square_number, columns_in_square, value, 1)
+                elif modified_columns[0] == 0 and modified_columns[1] == 0 and modified_columns[2] > 0:
+                    self.fill_possible_impossible_values_column(matrix, square_number, columns_in_square, value, 2)
 
     def fill_possible_impossible_values_row(self, matrix, square_number, lines, value, local_row):
         row_number = lines[local_row][0].row
@@ -283,7 +287,7 @@ class Field:
                                  (each.square == square_number or each.value is None)]
         if sum(values_in_same_square) == 9:
             for matrix_cell in lines[local_row]:
-                self.cells[matrix_cell.pos - 1].possible_options.add(value)
+                self.cells[matrix_cell.i].possible_options_row.add(value)
 
     def fill_possible_impossible_values_column(self, matrix, square_number, columns, value, local_column):
         column_number = columns[local_column][0].column
@@ -292,7 +296,7 @@ class Field:
                                  (each.square == square_number or each.value is None)]
         if sum(values_in_same_square) == 9:
             for matrix_cell in columns[local_column]:
-                self.cells[matrix_cell.pos - 1].possible_options.add(value)
+                self.cells[matrix_cell.i].possible_options_column.add(value)
 
 
 class FieldTests(unittest.TestCase):
@@ -452,6 +456,13 @@ class FieldTests(unittest.TestCase):
         self.assertTrue(field.self_check())
         field.cells[0].value = 1
         self.assertFalse(field.self_check())
+
+    def test_exper_level(self):
+        field = Field()
+        field.read_xlsx(r'expert.xlsx')
+        field.find_answer()
+        self.assertEqual(81, field.found)
+        self.assertTrue(field.self_check())
 
 #   1   2	3
 #   4   5	6
